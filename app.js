@@ -12,7 +12,7 @@ var port = process.env.PORT || 3000;
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post('/commands', commands);
-app.get('/get_orders', Order.prototype.readFirebaseOrders);
+app.get('/get_orders', Order.prototype.readTodaysFirebaseOrders);
 
 // error handler
 app.use(function (err, req, res, next) {

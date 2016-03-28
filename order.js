@@ -7,11 +7,22 @@ var firebase = new Firebase(private.firebase);
 
 var Order = {prototype: {}};
 
-Order.prototype.readFirebaseOrders = function() {
+Order.prototype.readTodaysFirebaseOrders = function(req, res) {
   console.log('reading orders');
-  firebase.on('value', function(snapshot) {
-    console.log(snapshot.val());
-    res.json(snapshot.val());
+  firebase.child('orders')
+          .child(moment().format('MM-DD-YYYY'))
+          .on('value', function(snapshot) {
+
+  //  console.log(snapshot.val());
+  //  var toSend = {};
+
+  //  toSend.users = snapshot.val().keys();
+  //  snapshot.val().forEach(function(item) {
+
+  //  })
+
+    res.json({ users: ['mithun', 'bsmyth'],
+               items: [{'Garlic Naan': true}, {'Butter Chicken (Chef Recommended)': {'spice': 'Spicy'}}, {'Samosa': true}, {'Mango Lassi': true}]});
   });
 }
 
