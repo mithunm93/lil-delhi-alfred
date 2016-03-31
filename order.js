@@ -1,8 +1,6 @@
 var Firebase = require('firebase');
 var moment = require('moment');
-
 var private = require('./private')
-
 var firebase = new Firebase(private.firebase);
 
 var Order = {prototype: {}};
@@ -21,10 +19,10 @@ Order.prototype.readTodaysFirebaseOrders = function(req, res) {
 
   //  })
 
-    res.json({ users: ['mithun', 'bsmyth'],
-               items: [{'Garlic Naan': true}, {'Butter Chicken (Chef Recommended)': {'spice': 'Spicy'}}, {'Samosa': true}, {'Mango Lassi': true}]});
+    res.json({ users: [['antonio', 'rocca']],
+               items: [{'Garlic Naan': true}, {'Butter Chicken (Chef Recommended)': {'spice': 'Spicy'}}, {'Samosa': true}, {'Mango Lassi': true}, {'Mango Lassi': true}, {'Mango Lassi': true}] });
   });
-}
+};
 
 Order.prototype.placeOrder = function(user, order) {
     order = order.split(',');
@@ -45,11 +43,12 @@ Order.prototype.placeOrder = function(user, order) {
         name = item.substring(0,j);
       }
 
+      // TODO: need to check if name exists
       toWrite[name] = (spice === undefined) ? true : { spice: spice };
     });
 
     writeFirebaseOrder(user, toWrite);
-}
+};
 
 // HELPER METHODS
 
