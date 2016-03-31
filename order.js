@@ -1,9 +1,11 @@
 var Firebase = require('firebase');
 var moment = require('moment');
-var private = require('./private')
+var private = require('./private');
+var LittleDelhi = require('./littleDelhi');
 var firebase = new Firebase(private.firebase);
 
 var Order = {prototype: {}};
+var INVALID_ORDER_TEXT = ' is not a valid Little Delhi item! Use: "alfred list" to see the list of valid items';
 
 Order.prototype.readTodaysFirebaseOrders = function(req, res) {
   console.log('reading orders');
@@ -28,7 +30,7 @@ Order.prototype.placeOrder = function(user, order) {
     order = order.split(',');
     var toWrite = {};
 
-    order.forEach(function(item, i, arr) {
+    for (item of order) {
       // leading space
       if (item[0] === ' ')
         item = item.substring(1, item.length);
@@ -41,16 +43,25 @@ Order.prototype.placeOrder = function(user, order) {
       if (j !== -1) {
         spice = item.substring(j+1, item.indexOf(')'));
         name = item.substring(0,j);
+        // trailing space before ()
+        if (name[name.length-1] === ' ')
+          name = name.substring(0, name.length-1);
       }
 
-      // TODO: need to check if name exists
-      toWrite[name] = (spice === undefined) ? true : { spice: spice };
-    });
+      if (itemExists(name))
+        toWrite[name] = (spice === undefined) ? true : { spice: spice };
+      else
+        return name + INVALID_ORDER_TEXT;
+    }
 
     writeFirebaseOrder(user, toWrite);
 };
 
 // HELPER METHODS
+
+function itemExists(item) {
+  return LittleDelhi[item] !== undefined;
+}
 
 function writeFirebaseOrder(user, order) {
   var date = moment().format('MM-DD-YYYY');
