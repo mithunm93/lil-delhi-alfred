@@ -3,13 +3,17 @@ var private = require('./private');
 
 var Slack = {prototype:{}};
 
-Slack.prototype.send = function(text, user) {
+Slack.prototype.slackFormat = function(user, text) {
   var t = '';
   if (user !== null)
     t += ('<@' + user + '> ');
 
   t += text;
-  request.post(private.slack_url, { body:JSON.stringify({text: t}) });
+
+  return { text: t };
+}
+Slack.prototype.send = function(user, text) {
+  request.post(private.slack_url, { body:JSON.stringify(Slack.prototype.slackFormat(user, text)) });
 };
 
 module.exports = Slack;

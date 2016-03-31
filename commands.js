@@ -1,6 +1,8 @@
 var Order = require('./order.js');
 var User = require('./user.js');
 
+var INVALID_COMMAND_TEXT = 'I am sorry, I did not understand that statement. Please check the docs to learn about my features';
+
 module.exports = function (req, res, next) {
 
   var text = req.body.text;
@@ -25,7 +27,7 @@ module.exports = function (req, res, next) {
     // optional spice level after name (defaults to mild on seamless) _____________|   |
     // comma separated ________________________________________________________________|
 
-    Order.prototype.placeOrder(req.body.user_name, message);
+    Order.prototype.placeOrder(req.body.user_name, message, res);
   } else if (text.indexOf('name') !== -1) {
     // check if name set request
 
@@ -38,7 +40,9 @@ module.exports = function (req, res, next) {
     // last name ______________________________________________________________|
 
     User.prototype.setUser(req.body.user_name, message, res);
-  }
+  } else {
+    // no valid terms were used
 
-  return res.status(200).end();
+    return res.json(Slack.prototype.slackFormat(req.body.user_name, INVALID_COMMAND_TEXT));
+  }
 }
