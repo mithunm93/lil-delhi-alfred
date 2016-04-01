@@ -1,3 +1,4 @@
+// TODO: account for DST
 var moment = require('moment');
 var FirebaseHelper = require('./firebaseHelper.js');
 var Errors = require('./errors');
@@ -79,7 +80,7 @@ function readTodaysFirebaseOrders(args) {
 
   console.log('reading orders');
   firebase.child('orders')
-          .child(moment().format('MM-DD-YYYY'))
+          .child(moment().utcOffset("-07:00").format('MM-DD-YYYY'))
           .once('value', function(snapshot) {
 
     var orders = snapshot.val();
@@ -107,7 +108,7 @@ function itemExists(item) {
 }
 
 function writeFirebaseOrder(user, fullName, order) {
-  var date = moment().format('MM-DD-YYYY');
+  var date = moment().utcOffset("-07:00").format('MM-DD-YYYY');
   var writeTo = firebase.child('orders').child(date).child(user);
   var entry = { name: fullName, order: order };
 
