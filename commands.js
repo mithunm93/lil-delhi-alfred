@@ -1,10 +1,12 @@
+var FirebaseHelper = require('./firebaseHelper.js');
+var Slack = require('./slack.js');
+var Errors = require('./errors');
+var private = require('./private');
 var Order = require('./order.js');
 var User = require('./user.js');
+var firebase = FirebaseHelper.prototype.ref;
 
-var INVALID_COMMAND_TEXT = 'I am sorry, I did not understand that statement. Please check the docs to learn about my features';
-
-module.exports = function (req, res, next) {
-
+function commands(req, res, next) {
   var text = req.body.text;
   if (!text) return res.status(500).end();
   text = text.toLowerCase();
@@ -43,6 +45,31 @@ module.exports = function (req, res, next) {
   } else {
     // no valid terms were used
 
-    return res.json(Slack.prototype.slackFormat(req.body.user_name, INVALID_COMMAND_TEXT));
+    return res.json(Slack.prototype.slackFormat(req.body.user_name, Errors.INVALID_COMMAND_TEXT));
+  }
+}
+
+module.exports = function (req, res, next) {
+  // Ensure request came from #ot-lil-delhi
+  if (req.body.token !== private.slackSecret) {
+    console.log("Request does not have proper secret");
+    return res.json(Slack.prototype.slackFormat(null, Errors.UNAUTHORIZED_ACCESS));
+  }
+
+  console.log("Received message from #ot-lil-delhi");
+
+  var authData = firebase.getAuth();
+
+  if (authData)
+    return commands(req, res, next);
+  else {
+    firebase.authWithCustomToken(FirebaseHelper.prototype.getNewToken(), function(error, authData) {
+      if (error)
+        FirebaseHelper.prototype.failureCallback(error);
+      else {
+        console.log("Login Succeeded!", authData);
+        return commands(req, res, next);
+      }
+    });
   }
 }

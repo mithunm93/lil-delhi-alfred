@@ -1,10 +1,9 @@
-var Firebase = require('firebase');
-var private = require('./private');
+var FirebaseHelper = require('./firebaseHelper.js');
+var Errors = require('./errors');
 var Slack = require('./slack.js')
-var firebase = new Firebase(private.firebase);
 
 var User = {prototype: {}};
-var INVALID_NAME_TEXT = ' is an invalid name. Your command must be formatted as such: alfred name "<FIRST> <LAST>"';
+var firebase = FirebaseHelper.prototype.ref;
 
 User.prototype.setUser = function(user, text, res) {
   var u = {};
@@ -12,7 +11,7 @@ User.prototype.setUser = function(user, text, res) {
 
   if (i === -1) {
     console.log('Invalid name: ' + text);
-    return res.json(Slack.prototype.slackFormat(user, text + INVALID_NAME_TEXT));
+    return res.json(Slack.prototype.slackFormat(user, text + Errors.INVALID_NAME_TEXT));
   }
 
   var first = text.substring(0, i);
