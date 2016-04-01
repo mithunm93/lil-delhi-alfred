@@ -17,9 +17,12 @@ var firebase = FirebaseHelper.prototype.ref;
 // silently on pretty much any hiccup.
 Order.prototype.readTodaysFirebaseOrders = function(req, res) {
   // TODO: make a routes table similar to commands, for GETs
-  if (!(req.headers && req.headers.token === private.slackSecret))
+  if (!(req.headers && req.headers.token === private.slackSecret)) {
+    console.log("Request does not have proper secret");
     return res.json(Slack.prototype.slackFormat(null, Errors.UNAUTHORIZED_ACCESS));
+  }
 
+  console.log('Received request to get order from authorized sender');
   FirebaseHelper.prototype.authThenRun(readTodaysFirebaseOrders, res);
 
 };
