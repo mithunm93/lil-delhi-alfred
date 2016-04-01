@@ -3,6 +3,7 @@ var FirebaseHelper = require('./firebaseHelper.js');
 var Errors = require('./errors');
 var LittleDelhi = require('./littleDelhi');
 var Slack = require('./slack.js');
+var private = require('./private');
 
 var Order = {prototype: {}};
 var firebase = FirebaseHelper.prototype.ref;
@@ -14,28 +15,12 @@ var firebase = FirebaseHelper.prototype.ref;
 // This exact format is required because Casper is very dumb, and will fail
 // silently on pretty much any hiccup.
 Order.prototype.readTodaysFirebaseOrders = function(req, res) {
-  console.log('reading orders');
-  firebase.child('orders')
-          .child(moment().format('MM-DD-YYYY'))
-          .once('value', function(snapshot) {
+  // TODO: make a routes table similar to commands, for GETs
+  if (!(req.headers && req.headers.token === private.slackSecret))
+    return res.json(Slack.prototype.slackFormat(null, Errors.UNAUTHORIZED_ACCESS));
 
-    var orders = snapshot.val();
-    var orderNames = Object.keys(orders);
-    var toReturn = { users: [], items: [] }
-    console.log(orderNames.length + ' orders received');
+  FirebaseHelper.prototype.authThenRun(readTodaysFirebaseOrders, res);
 
-    if (orderNames.length === 0)
-      return res.json(toReturn);
-
-    for (o in orders) {
-      toReturn.users.push(orders[o].name);
-
-      for (i of orders[o].order)
-        toReturn.items.push(i);
-    }
-
-    return res.json(toReturn);
-  }, FirebaseHelper.prototype.failureCallback);
 };
 
 Order.prototype.placeOrder = function(user, order, res) {
@@ -88,6 +73,34 @@ Order.prototype.placeOrder = function(user, order, res) {
 };
 
 // HELPER METHODS
+
+function readTodaysFirebaseOrders(args) {
+  var res = args[0];
+
+  console.log('reading orders');
+  firebase.child('orders')
+          .child(moment().format('MM-DD-YYYY'))
+          .once('value', function(snapshot) {
+
+    var orders = snapshot.val();
+    var toReturn = { users: [], items: [] }
+
+    if (orders) {
+      var orderNames = Object.keys(orders);
+      console.log(orderNames.length + ' orders received');
+
+
+      for (o in orders) {
+        toReturn.users.push(orders[o].name);
+
+        for (i of orders[o].order)
+          toReturn.items.push(i);
+      }
+    }
+
+    return res.json(toReturn);
+  }, FirebaseHelper.prototype.failureCallback);
+}
 
 function itemExists(item) {
   return LittleDelhi[item] !== undefined;

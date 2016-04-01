@@ -6,7 +6,10 @@ var Order = require('./order.js');
 var User = require('./user.js');
 var firebase = FirebaseHelper.prototype.ref;
 
-function commands(req, res, next) {
+function commands(args) {
+  var req = args[0];
+  var res = args[1];
+
   var text = req.body.text;
   if (!text) return res.status(500).end();
   text = text.toLowerCase();
@@ -49,7 +52,7 @@ function commands(req, res, next) {
   }
 }
 
-module.exports = function (req, res, next) {
+module.exports = function (req, res) {
   // Ensure request came from #ot-lil-delhi
   if (req.body.token !== private.slackSecret) {
     console.log("Request does not have proper secret");
@@ -58,18 +61,5 @@ module.exports = function (req, res, next) {
 
   console.log("Received message from #ot-lil-delhi");
 
-  var authData = firebase.getAuth();
-
-  if (authData)
-    return commands(req, res, next);
-  else {
-    firebase.authWithCustomToken(FirebaseHelper.prototype.getNewToken(), function(error, authData) {
-      if (error)
-        FirebaseHelper.prototype.failureCallback(error);
-      else {
-        console.log("Login Succeeded!", authData);
-        return commands(req, res, next);
-      }
-    });
-  }
+  FirebaseHelper.prototype.authThenRun(commands, req, res);
 }
