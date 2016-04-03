@@ -3,7 +3,7 @@
   "UNAUTHORIZED_ACCESS" : "Improper token received",
 
   "INVALID_ORDER_TEXT" : " is not a valid Little Delhi item! Use: 'alfred list' to see the list of valid items",
-  "NO_NAME_TEXT" : " you have not registered your name yet! Use: alfred name \"<FIRST> <LAST>\", to set your name",
+  "NO_INFO_TEXT" : " you have not registered your name and number yet! Use: alfred info \"<FIRST> <LAST>, ##########\", to set your name and number",
 
-  "INVALID_NAME_TEXT" : " is an invalid name. Your command must be formatted as such: alfred name \"<FIRST> <LAST>\""
+  "INVALID_INFO_TEXT" : " is invalid. Your command must be formatted as such: alfred info \"<FIRST> <LAST>, ##########\""
 }

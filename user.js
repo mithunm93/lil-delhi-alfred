@@ -4,24 +4,50 @@ var Slack = require('./slack.js')
 
 var User = {prototype: {}};
 var firebase = FirebaseHelper.prototype.ref;
+var slackFormat = Slack.prototype.slackFormat;
 
 User.prototype.setUser = function(user, text, res) {
   var u = {};
-  var i = text.indexOf(' ');
+  text = text.split(',');
+  
+  if (text.length !== 2) {
+    console.log('Invalid number of arguments: ' + text);
+    return res.json(slackFormat(user, name + Errors.INVALID_INFO_TEXT));
+  }
+  var name = text[0];
+  var number = text[1];
+
+  // parse first and last name
+  var i = name.indexOf(' ');
 
   if (i === -1) {
-    console.log('Invalid name: ' + text);
-    return res.json(Slack.prototype.slackFormat(user, text + Errors.INVALID_NAME_TEXT));
+    console.log('Invalid name: ' + name);
+    return res.json(slackFormat(user, name + Errors.INVALID_INFO_TEXT));
   }
 
-  var first = text.substring(0, i);
-  var last = text.substring(i+1, text.length);
+  var first = name.substring(0, i);
+  var last = name.substring(i+1, name.length);
 
-  u[user] = [first, last];
-  firebase.child('users').update(u);
-  console.log('added ' + first + ' ' + last + ' to ' + user);
+  u['name'] = [first, last];
 
-  return res.status(200).end();
+  // parse number
+
+  // leading space
+  if (number[0] === ' ')
+    number = number.substring(1, number.length);
+
+  // ensure number is digits only
+  if (!(/^\d+$/.test(number))) {
+    console.log('Invlaid number: ' + number);
+    return res.json(slackFormat(user, number + Errors.INVALID_INFO_TEXT));
+  }
+
+  u['number'] = number;
+
+  firebase.child('users').child(user).update(u);
+  console.log('added ' + first + ' ' + last + ', ' + number + ' to ' + user);
+
+  return res.json(slackFormat(user, 'Thank you for the info'));
 };
 
 module.exports = User;

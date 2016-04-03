@@ -12,8 +12,11 @@ Slack.prototype.slackFormat = function(user, text) {
 
   return { text: t };
 }
+
 Slack.prototype.send = function(user, text) {
-  request.post(private.slack_url, { body:JSON.stringify(Slack.prototype.slackFormat(user, text)) });
+  var t = Slack.prototype.slackFormat(user, text);
+  request.post(private.slack, { body:JSON.stringify(t) });
+  console.log('Posted to slack: ' + t.text);
 };
 
 module.exports = Slack;

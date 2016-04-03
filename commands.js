@@ -5,16 +5,18 @@ var private = require('./private');
 var Order = require('./order.js');
 var User = require('./user.js');
 var firebase = FirebaseHelper.prototype.ref;
+var slackFormat = Slack.prototype.slackFormat;
 
 function commands(args) {
   var req = args[0];
   var res = args[1];
 
   var text = req.body.text;
+  var user = req.body.user_name;
   if (!text) return res.status(500).end();
   text = text.toLowerCase();
 
-  console.log('Message received: ' + text);
+  console.log('Message received from ' + user + ': ' + text);
 
   var start = text.indexOf('"') +1;
   var message = text.substring(start, text.indexOf('"', start));
@@ -32,8 +34,8 @@ function commands(args) {
     // optional spice level after name (defaults to mild on seamless) _____________|   |
     // comma separated ________________________________________________________________|
 
-    Order.prototype.placeOrder(req.body.user_name, message, res);
-  } else if (text.indexOf('name') !== -1) {
+    Order.prototype.placeOrder(user, message, res);
+  } else if (text.indexOf('info') !== -1) {
     // check if name set request
 
     // Format of name set should be like so:
@@ -44,11 +46,11 @@ function commands(args) {
     // first name _____________________________________________________|       |
     // last name ______________________________________________________________|
 
-    User.prototype.setUser(req.body.user_name, message, res);
+    User.prototype.setUser(user, message, res);
   } else {
     // no valid terms were used
 
-    return res.json(Slack.prototype.slackFormat(req.body.user_name, Errors.INVALID_COMMAND_TEXT));
+    return res.json(slackFormat(user, Errors.INVALID_COMMAND_TEXT));
   }
 }
 
@@ -56,7 +58,7 @@ module.exports = function (req, res) {
   // Ensure request came from #ot-lil-delhi
   if (req.body.token !== private.slackSecret) {
     console.log("Request does not have proper secret");
-    return res.json(Slack.prototype.slackFormat(null, Errors.UNAUTHORIZED_ACCESS));
+    return res.json(slackFormat(null, Errors.UNAUTHORIZED_ACCESS));
   }
 
   console.log("Received message from #ot-lil-delhi");
