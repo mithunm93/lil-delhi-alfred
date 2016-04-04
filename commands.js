@@ -36,17 +36,63 @@ function commands(args) {
 
     Order.prototype.placeOrder(user, message, res);
   } else if (text.indexOf('info') !== -1) {
-    // check if name set request
+    // check if info set request
 
-    // Format of name set should be like so:
+    // Format of info set should be like so:
     //
-    //                                            alfred my name is "Mithun Manivannan"
-    //                                                       ^         ^       ^
-    // 'name' to indicate setting your name _________________|         |       |
-    // first name _____________________________________________________|       |
-    // last name ______________________________________________________________|
+    //                                            alfred my info is "John Smith, 0123456789"
+    //                                                       ^         ^    ^  ^     ^
+    // 'name' to indicate setting your name _________________|         |    |  |     |
+    // first name _____________________________________________________|    |  |     |
+    // last name ___________________________________________________________|  |     |
+    // comma separated ________________________________________________________|     |
+    // strictly numeric phone number ________________________________________________|
+    //
+    //
+    // ____________________ OR __________________________
+    //
+    // If nothing is specified in quotes, return the user's stored info
 
-    User.prototype.setUser(user, message, res);
+    User.prototype.userInfo(user, message, res);
+  } else if (text.indexOf('favorite') !== -1) {
+    // check if favorite set request
+
+    // Format of favorite request should be like so:
+    //
+    //                                       alfred set favorite "butter chicken(spicy), mango lassi, garlic naan"
+    //                                                      ^             ^        ^   ^
+    //                                                      |             |        |   |
+    // 'favorite' to indicate setting favorite _____________|             |        |   |
+    // name of food surrounded in quotes _________________________________|        |   |
+    // optional spice level after name (defaults to mild on seamless) _____________|   |
+    // comma separated ________________________________________________________________|
+    //
+    //
+    // ____________________ OR __________________________
+    //
+    // If nothing is specified in quotes, return the user's stored favorite
+
+    Order.prototype.setFavorite(user, message, res);
+  } else if (text.indexOf('list') !== -1) {
+    // check if list request
+
+    // Format of list request should be like so:
+    //
+    //                                     alfred list
+    //                                             ^
+    // 'list' to inidcate list request ____________|
+
+    Order.prototype.list(res);
+  } else if (text.indexOf('help') !== -1) {
+    // chek if requesting help
+
+    // Format of list request should be like so:
+    //
+    //                                     alfred help
+    //                                             ^
+    // 'help' to inidcate list request ____________|
+
+    User.prototype.help(res);
   } else {
     // no valid terms were used
 

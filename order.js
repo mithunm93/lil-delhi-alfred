@@ -4,6 +4,7 @@ var FirebaseHelper = require('./firebaseHelper.js');
 var Errors = require('./errors');
 var LittleDelhi = require('./littleDelhi');
 var Slack = require('./slack.js');
+var User = require('./user.js');
 var private = require('./private');
 
 var Order = {prototype: {}};
@@ -34,19 +35,100 @@ Order.prototype.readTodaysFirebaseOrders = function(req, res) {
 Order.prototype.placeOrder = function(user, order, res) {
 
   // perform a check to ensure the user has a name and number on file
-  firebase.child('users').child(user).once('value', function(snapshot) {
-    var info = snapshot.val();
+  User.prototype.checkInfoExistsThenRun(user, function(args) {
+    var user = args[0];
+    var order = args[1];
+    var res = args[2];
 
-    if (!info) {
-      console.log('No info for: ' + user);
-      return res.json(slackFormat(user, Errors.NO_INFO_TEXT));
+    // placing favorite
+    if (order === '') {
+      User.prototype.checkFavoriteExistsThenRun(user, function(args) {
+        console.log('Favorite received for: ' + user);
+        var favorite = args[0];
+        writeFirebaseOrder(user, favorite);
+        return res.json(slackFormat(user, 'Your order has been placed'));
+      }, function() {
+        console.log('No favorite for: ' + user);
+        return res.json(slackFormat(user, Errors.NO_FAVORITE_TEXT));
+      });
+    } else {
+      // TODO: better way to return if null
+      var parsedOrder = parseOrder(user, order, res);
+      if (parsedOrder) {
+        writeFirebaseOrder(user, parsedOrder);
+        res.json(slackFormat(user, 'Your order has been placed'));
+      }
+      return;
     }
 
-    return parseAndSaveOrder(user, order, res);
-  }, FirebaseHelper.prototype.failureCallback);
+  }, noUserInfoWarning, user, order, res);
 };
 
-// HELPER METHODS
+Order.prototype.setFavorite = function(user, order, res) {
+  // perform a check to ensure the user has a name and number on file
+  User.prototype.checkInfoExistsThenRun(user, function(args) {
+    var user = args[0];
+    var order = args[1];
+    var res = args[2];
+
+    var parsedOrder = parseOrder(user, order, res);
+    if (parsedOrder) {
+      writeFirebaseFavorite(user, parsedOrder);
+      res.json(slackFormat(user, 'Your favorite has been set'));
+    }
+    return;
+  }, noUserInfoWarning, user, order, res);
+}
+
+// Show list of available items
+Order.prototype.list = function(res) {
+  var text = 'Here are the list of accepted items: ```';
+  for (item in LittleDelhi)
+    text += (item + '\n');
+  text += '```';
+
+  console.log('Printing full list');
+  return res.json(slackFormat(null, text));
+}
+
+// ______________________HELPER METHODS_______________________________
+
+function parseOrder(user, order, res) {
+  order = order.split(',');
+  var toReturn = [];
+
+  for (item of order) {
+    // leading space
+    if (item[0] === ' ')
+      item = item.substring(1, item.length);
+
+    var spice = '';
+    var name = item;
+    var toPush = {};
+    var j = item.indexOf('(');
+
+    // spice level
+    if (j !== -1) {
+      spice = item.substring(j+1, item.indexOf(')'));
+      name = item.substring(0,j);
+      // trailing space before ()
+      if (name[name.length-1] === ' ')
+        name = name.substring(0, name.length-1);
+    }
+
+    if (itemExists(name)) {
+      toPush[name] = (spice === '') ? true : { spice: spice };
+      toReturn.push(toPush);
+    } else {
+      console.log('Invalid item: ' + name);
+      res.json(slackFormat(user, name + Errors.INVALID_ORDER_TEXT));
+      return;
+    }
+  }
+
+  return toReturn;
+}
+
 function pickRandomNumberFromOrder(order, userInfo) {
   var names = Object.keys(order);
   var i = Math.floor(Math.random() * names.length);
@@ -98,42 +180,6 @@ function readTodaysFirebaseOrders(args) {
   }, FirebaseHelper.prototype.failureCallback);
 }
 
-function parseAndSaveOrder (user, order, res) {
-  order = order.split(',');
-  var toWrite = [];
-
-  for (item of order) {
-    // leading space
-    if (item[0] === ' ')
-      item = item.substring(1, item.length);
-
-    var spice = '';
-    var name = item;
-    var toPush = {};
-    var j = item.indexOf('(');
-
-    // spice level
-    if (j !== -1) {
-      spice = item.substring(j+1, item.indexOf(')'));
-      name = item.substring(0,j);
-      // trailing space before ()
-      if (name[name.length-1] === ' ')
-        name = name.substring(0, name.length-1);
-    }
-
-    if (itemExists(name)) {
-      toPush[name] = (spice === '') ? true : { spice: spice };
-      toWrite.push(toPush);
-    } else {
-      console.log('Invalid item: ' + name);
-      return res.json(slackFormat(user, name + Errors.INVALID_ORDER_TEXT));
-    }
-  }
-
-  writeFirebaseOrder(user, toWrite);
-  return res.json(slackFormat(user, 'Your order has been taken'));
-}
-
 function itemExists(item) {
   return LittleDelhi[item] !== undefined;
 }
@@ -143,7 +189,22 @@ function writeFirebaseOrder(user, order) {
   var writeTo = firebase.child('orders').child(date).child(user);
   var entry = { order: order };
 
-  writeTo.set(entry, FirebaseHelper.prototype.failureCallback);
+  writeTo.update(entry, FirebaseHelper.prototype.failureCallback);
   console.log('Firebase write triggered for ' + user + 's order');
+}
+
+function writeFirebaseFavorite(user, order) {
+  var writeTo = firebase.child('users').child(user);
+  var entry = { favorite: order };
+
+  writeTo.update(entry, FirebaseHelper.prototype.failureCallback);
+  console.log('Firebase write triggered for ' + user + 's favorite');
+}
+
+function noUserInfoWarning(args) {
+  var user = args[0];
+  var res = args[2];
+  console.log('No info for: ' + user);
+  return res.json(slackFormat(user, Errors.NO_INFO_TEXT));
 }
 module.exports = Order;
