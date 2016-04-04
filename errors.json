@@ -1,5 +1,5 @@
 {
-  "INVALID_COMMAND_TEXT" : "I am sorry, I did not understand that statement. Please check the docs to learn about my features",
+  "INVALID_COMMAND_TEXT" : "I am sorry, I did not understand that statement. Please use 'alfred help' to learn about my features",
   "UNAUTHORIZED_ACCESS" : "Improper token received",
 
   "INVALID_ORDER_TEXT" : " is not a valid Little Delhi item. Use: 'alfred list' to see the list of valid items",

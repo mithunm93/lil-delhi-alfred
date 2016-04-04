@@ -1,7 +1,7 @@
 {
   "alfred" : "Hello! I'm here to help you order Little Delhi faster.\n\nHow to use me:\n" ,
   "enterInfo" : "  1. Set up your user information like this: ```alfred info \"John Smith, 0123456789\"``` Remember to only use numeric characters for the phone number\n\n",
-  "placeOrder" : "  2. Place your order like this: ```alfred order \"butter chicken (spicy), mango lassi, samosa\"``` Note that you can specify a spice level, leaving it blank just leaves it as default\n\n",
+  "placeOrder" : "  2. Place your order like this: ```alfred order \"butter chicken (spicy), mango lassi, samosa\"``` Note that you can specify a spice level in parentheses, leaving it blank just leaves it as default\n\n",
   "orderFinished" : "  3. The order will be placed around 4pm, and one of the orderers will be chosen at random to receive the call for the food\n\n",
 
   "extraActions" : "Some of my other features are:\n",

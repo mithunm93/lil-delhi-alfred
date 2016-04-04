@@ -19,4 +19,15 @@ Slack.prototype.send = function(user, text) {
   console.log('Posted to slack: ' + t.text);
 };
 
+Slack.prototype.pingSlack = function(req, res) {
+  if (req.body.token !== private.slackSecret) {
+    console.log("Request does not have proper secret");
+    return res.json(Slack.prototype.slackFormat(null, Errors.UNAUTHORIZED_ACCESS));
+  }
+
+  console.log('Taking orders now');
+  Slack.prototype.send(null, 'Taking orders now');
+  return res.status(200).end();
+}
+
 module.exports = Slack;

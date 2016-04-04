@@ -2,7 +2,8 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var commands = require('./commands.js');
 var private = require('./private');
-var Order = require('./order')
+var Order = require('./order');
+var Slack = require('./slack.js');
 
 var app = express();
 var port = process.env.PORT || 3000;
@@ -12,6 +13,7 @@ var port = process.env.PORT || 3000;
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post('/commands', commands);
+app.post('/ping_slack', Slack.prototype.pingSlack);
 app.get('/get_orders', Order.prototype.readTodaysFirebaseOrders);
 
 // error handler
