@@ -1,3 +1,4 @@
+var Errors = require('./errors');
 var request = require('request');
 var private = require('./private');
 
