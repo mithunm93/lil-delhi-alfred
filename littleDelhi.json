@@ -61,7 +61,7 @@
   "Seekh Kabab": { "name": "Seekh Kabab", "price": 10.99 },
   "shrimp tandoori": { "name": "Shrimp Tandoori", "price": 13.99 },
 
-  "rice pilau": { "name": "Rice Pilau", "price": 2},
+  "rice pilau": { "name": "Rice Pillau", "price": 2},
   "vegetable biryani": { "name": "Vegetable Pilau", "price": 9.99 },
   "lamb biryani": { "name": "Lamb Biryani", "price": 11.99 },
   "peas pilau": { "name": "Peas Pilau", "price": 3.99 },
@@ -84,13 +84,20 @@
   "raita": { "name": "Raita", "price": 1.5 },
   "mango chutney": { "name": "Mango Chutney", "price": 1.5 },
 
-  "kulfi": { "name": "Mango Chutney", "price": 2.99 },
-  "kheer": { "name": "Mango Chutney", "price": 2.5 },
-  "mango lassi": { "name": "Mango Chutney", "price": 2.5 },
-  "iced tea": { "name": "Mango Chutney", "price": 1.5 },
-  "gulab jamun": { "name": "Mango Chutney", "price": 2.99 },
-  "lassi": { "name": "Mango Chutney", "price": 1.99 },
-  "chai": { "name": "Mango Chutney", "price": 1.5 },
-  "nimbu pani": { "name": "Mango Chutney", "price": 1.5 }
+  "kulfi": { "name": "Kulfi", "price": 2.99 },
+  "kheer": { "name": "Kheer", "price": 2.5 },
+  "mango lassi": { "name": "Mango Lassi", "price": 2.5 },
+  "iced tea": { "name": "Iced Tea", "price": 1.5 },
+  "gulab jamun": { "name": "Gulab Jamun", "price": 2.99 },
+  "lassi": { "name": "Lassi", "price": 1.99 },
+  "chai": { "name": "Chai", "price": 1.5 },
+  "nimbu pani": { "name": "Nimbu Pani", "price": 1.5 },
+
+  "spices": {
+    "mild": "Mild" ,
+    "medium": "Medium",
+    "spicy": "Spicy",
+    "extra spicy": "Extra Spicy"
+  }
 }
 
