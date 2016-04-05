@@ -83,8 +83,15 @@ Order.prototype.setFavorite = function(user, order, res) {
 // Show list of available items
 Order.prototype.list = function(res) {
   var text = 'Here are the list of accepted items: ```';
-  for (item in LittleDelhi)
+  for (item in LittleDelhi) {
+    if (item !== 'spices')
     text += (item + '\n');
+  }
+
+  text += '\nSpice levels:\n '
+  for (s in LittleDelhi.spices)
+    text += (s + '\n');
+
   text += '```';
 
   console.log('Printing full list');
@@ -117,7 +124,7 @@ function parseOrder(user, order, res) {
     }
 
     if (itemExists(name)) {
-      toPush[name] = (spice === '') ? true : { spice: spice };
+      toPush[LittleDelhi[name].name] = (spice === '') ? true : { spice: LittleDelhi.spices[spice] };
       toReturn.push(toPush);
     } else {
       console.log('Invalid item: ' + name);
@@ -134,6 +141,7 @@ function pickRandomNumberFromOrder(order, userInfo) {
   var i = Math.floor(Math.random() * names.length);
 
   Slack.prototype.send(names[i], 'You will receive the call to pick up the order');
+  console.log(names[i] + ' will receive the call for the order');
 
   return userInfo[names[i]].number;
 }
@@ -158,6 +166,8 @@ function readTodaysFirebaseOrders(args) {
 
       console.log(Object.keys(orders).length + ' orders received');
 
+      // o is the 'user_name' in the data structured like this:
+      //   user_name : [ {order1: true}, {order2: {spice: 'spicy'}}, ... ]
       for (o in orders) {
         if (!userInfo[o]) {
           console.log(o + ' has no information stored! Skipping their order');
@@ -168,6 +178,10 @@ function readTodaysFirebaseOrders(args) {
         if (o !== private.selfUser)
           toReturn.users.push(userInfo[o].name);
 
+        // i is an object structered like this:
+        //   { order1: true }
+        //         OR
+        //   { order2: {spice: 'spicy'}}
         for (i of orders[o].order)
           toReturn.items.push(i);
       }
