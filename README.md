@@ -16,7 +16,7 @@ Note that you can specify a spice level, leaving it blank just leaves it as defa
 Some of my other features are:
 - Set a favorite list of items so that you don't have to specify your order each time:
 ```alfred favorite "butter chicken (spicy), mango lassi, samosa"```
-You can then place future orders with just `alfred order`. You can see your current favorite items by using `alfred favorite`
+You can then place future orders with just `alfred order`. You can see your current favorite items by using `alfred info`
 
 - See the list of available little delhi items with `alfred list`
 
