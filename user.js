@@ -85,17 +85,20 @@ function showInfo(user, res) {
     text += ('Number: ' + info.number + '\n');
     text += ('Favorite: ');
 
-    for (item of info.favorite) {
-      // name of item
-      var name = Object.keys(item)[0];
-      text += name;
-      // if it has a spice level
-      if (item[name] !== true)
-        text += ('(' + item[name].spice + ')');
-      text += ', ';
-    }
-    // remove trailing ', '
-    text = text.substring(0, text.length-2);
+    if (info.favorite) {
+      for (item of info.favorite) {
+        // name of item
+        var name = Object.keys(item)[0];
+        text += name;
+        // if it has a spice level
+        if (item[name] !== true)
+          text += ('(' + item[name].spice + ')');
+        text += ', ';
+      }
+      // remove trailing ', '
+      text = text.substring(0, text.length-2);
+    } else
+      text += 'None';
 
     text += '```';
 
