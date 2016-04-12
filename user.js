@@ -62,6 +62,7 @@ User.prototype.help = function(res) {
   text += Help.enterInfo;
   text += Help.placeOrder;
   text += Help.orderFinished;
+  text += Help.orderCompletion;
   text += Help.extraActions;
   text += Help.favorite;
   text += Help.list;
