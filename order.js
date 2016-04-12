@@ -11,6 +11,22 @@ var Order = {prototype: {}};
 var firebase = FirebaseHelper.prototype.ref;
 var slackFormat = Slack.prototype.slackFormat;
 
+Order.prototype.orderComplete = function(req, res) {
+  // TODO: make a routes table similar to commands
+  if (!(req.body && req.body.token === private.slackSecret)) {
+    console.log("Request does not have proper secret");
+    return res.json(slackFormat(null, Errors.UNAUTHORIZED_ACCESS));
+  }
+
+  if (req.body.success) {
+    console.log('Received successful completion message from Casper!');
+    Slack.prototype.send(null, 'Orders placed successfully by Casper');
+  } else {
+    console.log('Received order unsuccessful message from Casper');
+    Slack.prototype.send(null, 'Something went wrong in Casper\'s ordering process');
+  }
+}
+
 // This method is used by Casper, the expected return structure is this:
 //   { users: [['first', 'last'], ['first1', 'last1'], ...],
 //     number: '0123456789,

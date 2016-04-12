@@ -14,6 +14,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post('/commands', commands);
 app.post('/ping_slack', Slack.prototype.pingSlack);
+app.post('/order_completed', Order.prototype.orderComplete);
 app.get('/get_orders', Order.prototype.readTodaysFirebaseOrders);
 
 // error handler
