@@ -18,7 +18,7 @@ Order.prototype.orderComplete = function(req, res) {
     return res.json(slackFormat(null, Errors.UNAUTHORIZED_ACCESS));
   }
 
-  if (req.body.success) {
+  if (req.body.success === 'true') {
     console.log('Received successful completion message from Casper!');
     Slack.prototype.send(null, 'Orders placed successfully by Casper');
   } else {
