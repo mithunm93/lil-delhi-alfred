@@ -20,7 +20,7 @@ Order.prototype.orderComplete = function(req, res) {
 
   if (req.body.success === 'true') {
     console.log('Received successful completion message from Casper!');
-    Slack.prototype.send(null, 'Orders placed successfully by Casper');
+    Slack.prototype.send(null, 'Order placed successfully by Casper');
   } else {
     console.log('Received order unsuccessful message from Casper');
     Slack.prototype.send(null, 'Something went wrong in Casper\'s ordering process');
