@@ -55,10 +55,10 @@
 
   "chicken tandoori": { "name": "Chicken Tandoori", "price": 10.99 },
   "chicken kabab": { "name": "Chicken Kabab", "price": 10.99 },
-  "Fish Tandoori": { "name": "Fish Tandoori", "price": 13.99 },
+  "fish tandoori": { "name": "Fish Tandoori", "price": 13.99 },
   "paneer shashlyk tandoori": { "name": "Paneer Shashlyk Tandoori", "price": 11.99 },
   "chicken tikka kabab": { "name": "Chicken Tikka Kabab", "price": 10.99 },
-  "Seekh Kabab": { "name": "Seekh Kabab", "price": 10.99 },
+  "seekh kabab": { "name": "Seekh Kabab", "price": 10.99 },
   "shrimp tandoori": { "name": "Shrimp Tandoori", "price": 13.99 },
 
   "rice pillau": { "name": "Rice Pillau", "price": 2},
