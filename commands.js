@@ -18,8 +18,8 @@ function commands(args) {
 
   console.log('Message received from ' + user + ': ' + text);
 
-  var start = text.indexOf('"') +1;
-  var message = text.substring(start, text.indexOf('"', start));
+  // find message between double quotes of any kind
+  var message = /["“”](.*?)["“”]/.exec(text)[1];
 
   if (text.indexOf('order') !== -1) {
     // check if order request
