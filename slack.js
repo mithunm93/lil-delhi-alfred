@@ -27,8 +27,9 @@ Slack.prototype.pingSlack = function(req, res) {
   }
 
   // since this method is only called at 1PM PST, no need to account for time zone (UTC is 7 hours ahead, same day)
-  if (day = new Date().getDay() === 0 || day === 6) return console.log('Don\'t ping on weekend');
-  return console.log("ERROR");
+  day = new Date().getDay()
+  if ( day === 0 || day === 6) 
+    return console.log('Don\'t ping on weekend');
 
   console.log('Taking orders now');
   Slack.prototype.send(null, 'Taking orders now');
