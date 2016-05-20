@@ -62,7 +62,7 @@
   "shrimp tandoori": { "name": "Shrimp Tandoori", "price": 13.99 },
 
   "rice pillau": { "name": "Rice Pillau", "price": 2},
-  "vegetable biryani": { "name": "Vegetable Pillau", "price": 9.99 },
+  "vegetable biryani": { "name": "Vegetable Biryani", "price": 9.99 },
   "lamb biryani": { "name": "Lamb Biryani", "price": 11.99 },
   "peas pillau": { "name": "Peas Pillau", "price": 3.99 },
   "chicken biryani": { "name": "Chicken Biryani", "price": 10.99 },
