@@ -1,5 +1,6 @@
 var _ = require('underscore');
 var private = require('./private');
+var moment = require('moment');
 var Firebase = require('firebase');
 var FirebaseTokenGenerator = require("firebase-token-generator");
 var tokenGenerator = new FirebaseTokenGenerator(private.firebaseSecret);
@@ -39,6 +40,40 @@ FirebaseHelper.prototype.authThenRun = function() {
       }
     });
   }
+}
+
+// provide a callback as the first argument that takes arguments like this:
+//
+//   functionCallback(arguments[1-last, orders])
+FirebaseHelper.prototype.readTodaysOrders = function() {
+  var args =  _.map(arguments, function(a) {return a});
+  var callback = args.shift();
+
+  console.log('reading today\'s orders');
+  FirebaseHelper.prototype.ref.child('orders')
+    .child(moment().utcOffset("-07:00").format('MM-DD-YYYY'))
+    .once('value', function(snapshot) {
+
+      var orders = snapshot.val();
+      args.push(orders)
+      callback(args);
+  });
+}
+
+// provide a callback as the first argument that takes arguments like this:
+//
+//   functionCallback(arguments[1-last, userInfo])
+FirebaseHelper.prototype.getUserInfo = function() {
+  var args =  _.map(arguments, function(a) {return a});
+  var callback = args.shift();
+
+  console.log('getting user info');
+  FirebaseHelper.prototype.ref.child('users').once('value', function(snapshot) {
+
+    var userInfo = shapshot.val();
+    args.push(userInfo);
+    callback(args);
+  });
 }
 
 module.exports = FirebaseHelper;

@@ -115,6 +115,19 @@ Order.prototype.list = function(res) {
   return res.json(slackFormat(null, text));
 }
 
+// Show current order status
+Order.prototype.status = function(user, res) {
+  User.prototype.checkInfoExistsThenRun(user, function() {
+    FirebaseHelper.prototype.readTodaysOrders(function(args) {
+      var orders = args[0];
+      if (!orders || !orders[user])
+        return res.json(slackFormat(user, Errors.NO_ORDER_TEXT));
+      else
+        return res.json(slackFormat(user, orderPlacedMessage(orders[user].order)));
+    });
+  }, noUserInfoWarning);
+}
+
 // ______________________HELPER METHODS_______________________________
 
 function formatParsedOrder(pOrder) {

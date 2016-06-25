@@ -94,6 +94,16 @@ function commands(args) {
     // 'help' to inidcate list request ____________|
 
     User.prototype.help(res);
+  } else if (text.indexOf('status') !== -1) {
+    // show the current status of the order
+
+    // Format of status request should be like so:
+    //
+    //                                     alfred status
+    //                                              ^
+    // 'status' to indicate status request _________|
+
+    Order.prototype.status(user, res);
   } else {
     // no valid terms were used
 
