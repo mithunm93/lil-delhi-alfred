@@ -1,4 +1,5 @@
 // TODO: account for DST
+var _ = require('underscore');
 var moment = require('moment');
 var FirebaseHelper = require('./firebaseHelper.js');
 var Errors = require('./errors');
@@ -62,7 +63,7 @@ Order.prototype.placeOrder = function(user, order, res) {
         console.log('Favorite received for: ' + user);
         var favorite = args[0];
         writeFirebaseOrder(user, favorite);
-        return res.json(slackFormat(user, 'Your order has been placed'));
+        return res.json(slackFormat(user, orderPlacedMessage(favorite)));
       }, function() {
         console.log('No favorite for: ' + user);
         return res.json(slackFormat(user, Errors.NO_FAVORITE_TEXT));
@@ -72,7 +73,7 @@ Order.prototype.placeOrder = function(user, order, res) {
       var parsedOrder = parseOrder(user, order, res);
       if (parsedOrder) {
         writeFirebaseOrder(user, parsedOrder);
-        res.json(slackFormat(user, 'Your order has been placed'));
+        res.json(slackFormat(user, orderPlacedMessage(parsedOrder)));
       }
       return;
     }
@@ -115,6 +116,50 @@ Order.prototype.list = function(res) {
 }
 
 // ______________________HELPER METHODS_______________________________
+
+function formatParsedOrder(pOrder) {
+  return _.map(pOrder, function (item) {
+    name = Object.keys(item)[0];
+    spice = item[name]['spice'] || false;
+    return [name, spice];
+  });
+}
+
+function totalPrice(order) {
+  // format for easy use
+  fOrder = formatParsedOrder(order);
+
+  price = 0;
+  for (var i = 0; i < fOrder.length; i++)
+    price += LittleDelhi[fOrder[i][0]]['price'];
+
+  return price;
+}
+
+function orderPlacedMessage(order) {
+  var text = 'You have ordered '
+
+  // format for easy use
+  fOrder = formatParsedOrder(order);
+
+  // if more than one item, make a list
+  for (var i = 0; i < fOrder.length -1; i++) {
+    text += fOrder[i][0];
+    if (fOrder[i][1])
+      text += '(' + fOrder[i][1] + ')';
+    text += ', ';
+  }
+
+  if (order.length > 1)
+    text += 'and ';
+
+  text += _.last(fOrder)[0]
+  if (_.last(fOrder)[1])
+    text += '(' +  _.last(fOrder)[1] + ')';
+
+  text += '. $' + totalPrice(order) + ' is your order total.';
+  return text;
+}
 
 function parseOrder(user, order, res) {
   order = order.split(',');
