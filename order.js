@@ -101,7 +101,7 @@ Order.prototype.setFavorite = function(user, order, res) {
 Order.prototype.list = function(res) {
   var text = 'Here are the list of accepted items: ```';
   for (item in LittleDelhi) {
-    if (item !== 'spices')
+    if (item !== 'spices' && item !== 'reversed')
     text += (item + '\n');
   }
 
@@ -131,7 +131,7 @@ function totalPrice(order) {
 
   price = 0;
   for (var i = 0; i < fOrder.length; i++)
-    price += LittleDelhi[fOrder[i][0]]['price'];
+    price += LittleDelhi["reversed"][fOrder[i][0]]['price'];
 
   return price;
 }
