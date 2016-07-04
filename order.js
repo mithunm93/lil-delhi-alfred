@@ -125,7 +125,7 @@ Order.prototype.status = function(user, res) {
       else
         return res.json(slackFormat(user, orderPlacedMessage(orders[user].order)));
     });
-  }, noUserInfoWarning);
+  }, noUserInfoWarning, user, [], res);
 }
 
 // ______________________HELPER METHODS_______________________________
