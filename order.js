@@ -51,50 +51,36 @@ Order.prototype.readTodaysFirebaseOrders = function(req, res) {
 // users : { $user : { order : [$order1, $order2, ...] } }
 Order.prototype.placeOrder = function(user, order, res) {
 
-  // perform a check to ensure the user has a name and number on file
-  User.prototype.checkInfoExistsThenRun(user, function(args) {
-    var user = args[0];
-    var order = args[1];
-    var res = args[2];
-
-    // placing favorite
-    if (order === '') {
-      User.prototype.checkFavoriteExistsThenRun(user, function(args) {
-        console.log('Favorite received for: ' + user);
-        var favorite = args[0];
-        writeFirebaseOrder(user, favorite);
-        return res.json(slackFormat(user, orderPlacedMessage(favorite)));
-      }, function() {
-        console.log('No favorite for: ' + user);
-        return res.json(slackFormat(user, Errors.NO_FAVORITE_TEXT));
-      });
-    } else {
-      // TODO: better way to return if null
-      var parsedOrder = parseOrder(user, order, res);
-      if (parsedOrder) {
-        writeFirebaseOrder(user, parsedOrder);
-        res.json(slackFormat(user, orderPlacedMessage(parsedOrder)));
-      }
-      return;
+  // placing favorite
+  if (order === '') {
+    User.prototype.checkFavoriteExistsThenRun(user, function(args) {
+      console.log('Favorite received for: ' + user);
+      var favorite = args[0];
+      writeFirebaseOrder(user, favorite);
+      return res.json(slackFormat(user, orderPlacedMessage(favorite)));
+    }, function() {
+      console.log('No favorite for: ' + user);
+      return res.json(slackFormat(user, Errors.NO_FAVORITE_TEXT));
+    });
+  } else {
+    // TODO: better way to return if null
+    var parsedOrder = parseOrder(user, order, res);
+    if (parsedOrder) {
+      writeFirebaseOrder(user, parsedOrder);
+      res.json(slackFormat(user, orderPlacedMessage(parsedOrder)));
     }
-
-  }, noUserInfoWarning, user, order, res);
+    return;
+  }
 };
 
 Order.prototype.setFavorite = function(user, order, res) {
-  // perform a check to ensure the user has a name and number on file
-  User.prototype.checkInfoExistsThenRun(user, function(args) {
-    var user = args[0];
-    var order = args[1];
-    var res = args[2];
 
-    var parsedOrder = parseOrder(user, order, res);
-    if (parsedOrder) {
-      writeFirebaseFavorite(user, parsedOrder);
-      res.json(slackFormat(user, 'Your favorite has been set'));
-    }
-    return;
-  }, noUserInfoWarning, user, order, res);
+  var parsedOrder = parseOrder(user, order, res);
+  if (parsedOrder) {
+    writeFirebaseFavorite(user, parsedOrder);
+    res.json(slackFormat(user, 'Your favorite has been set'));
+  }
+  return;
 }
 
 // Show list of available items
@@ -117,15 +103,13 @@ Order.prototype.list = function(res) {
 
 // Show current order status
 Order.prototype.status = function(user, res) {
-  User.prototype.checkInfoExistsThenRun(user, function() {
-    FirebaseHelper.prototype.readTodaysOrders(function(args) {
-      var orders = args[0];
-      if (!orders || !orders[user])
-        return res.json(slackFormat(user, Errors.NO_ORDER_TEXT));
-      else
-        return res.json(slackFormat(user, orderPlacedMessage(orders[user].order)));
-    });
-  }, noUserInfoWarning, user, [], res);
+  FirebaseHelper.prototype.readTodaysOrders(function(args) {
+    var orders = args[0];
+    if (!orders || !orders[user])
+      return res.json(slackFormat(user, Errors.NO_ORDER_TEXT));
+    else
+      return res.json(slackFormat(user, orderPlacedMessage(orders[user].order)));
+  });
 }
 
 // ______________________HELPER METHODS_______________________________
