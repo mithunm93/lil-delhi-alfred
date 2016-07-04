@@ -44,7 +44,6 @@ Order.prototype.readTodaysFirebaseOrders = function(req, res) {
 
   console.log('Received request to get order from authorized sender');
   FirebaseHelper.prototype.authThenRun(readTodaysFirebaseOrders, res);
-
 };
 
 // Writes to Firebase the order placed by user formatted like so:
@@ -69,7 +68,6 @@ Order.prototype.placeOrder = function(user, order, res) {
       writeFirebaseOrder(user, parsedOrder);
       res.json(slackFormat(user, orderPlacedMessage(parsedOrder)));
     }
-    return;
   }
 };
 
@@ -80,7 +78,6 @@ Order.prototype.setFavorite = function(user, order, res) {
     writeFirebaseFavorite(user, parsedOrder);
     res.json(slackFormat(user, 'Your favorite has been set'));
   }
-  return;
 }
 
 // Show list of available items
@@ -134,7 +131,7 @@ function totalPrice(order) {
 }
 
 function orderPlacedMessage(order) {
-  var text = 'You have ordered '
+  var text = 'You have ordered ';
 
   // format for easy use
   fOrder = formatParsedOrder(order);
