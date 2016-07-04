@@ -20,7 +20,7 @@ User.prototype.userInfo = function(user, text, res) {
 //   SECOND argument must be success callback
 //   THIRD argument must be failure callback
 User.prototype.checkInfoExistsThenRun = function() {
-  var args = _.map(arguments, function(a) {return a;});
+  var args = _.toArray(arguments);
   var user = args.shift();
   var successCallback = args.shift();
   var failureCallback = args.shift();
@@ -41,7 +41,7 @@ User.prototype.checkInfoExistsThenRun = function() {
 //   SECOND argument must be success callback
 //   THIRD argument must be failure callback
 User.prototype.checkFavoriteExistsThenRun = function() {
-  var args = _.map(arguments, function(a) {return a;});
+  var args = _.toArray(arguments);
   var user = args.shift();
   var successCallback = args.shift();
   var failureCallback = args.shift();

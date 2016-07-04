@@ -24,7 +24,7 @@ FirebaseHelper.prototype.failureCallback = function(error) {
 //
 // TODO: make these FirebaseHelper calls more succinct
 FirebaseHelper.prototype.authThenRun = function() {
-  var args = _.map(arguments, function(a) {return a;});
+  var args = _.toArray(arguments);
   var callback = args.shift();
   var authData = FirebaseHelper.prototype.ref.getAuth();
 
@@ -46,7 +46,7 @@ FirebaseHelper.prototype.authThenRun = function() {
 //
 //   functionCallback(arguments[1-last, orders])
 FirebaseHelper.prototype.readTodaysOrders = function() {
-  var args =  _.map(arguments, function(a) {return a});
+  var args = _.toArray(arguments);
   var callback = args.shift();
 
   console.log('reading today\'s orders');
@@ -64,7 +64,7 @@ FirebaseHelper.prototype.readTodaysOrders = function() {
 //
 //   functionCallback(arguments[1-last, userInfo])
 FirebaseHelper.prototype.getUserInfo = function() {
-  var args =  _.map(arguments, function(a) {return a});
+  var args = _.toArray(arguments);
   var callback = args.shift();
 
   console.log('getting user info');
