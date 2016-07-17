@@ -245,10 +245,4 @@ function itemExists(item) {
   return LittleDelhi[item] !== undefined;
 }
 
-function noUserInfoWarning(args) {
-  var user = args[0];
-  var res = args[2];
-  console.log('No info for: ' + user);
-  return res.json(slackFormat(user, Errors.NO_INFO_TEXT));
-}
 module.exports = Order;
