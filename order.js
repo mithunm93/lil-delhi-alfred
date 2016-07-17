@@ -55,7 +55,7 @@ Order.prototype.placeOrder = function(user, order, res) {
     User.prototype.checkFavoriteExistsThenRun(user, function(args) {
       console.log('Favorite received for: ' + user);
       var favorite = args[0];
-      writeFirebaseOrder(user, favorite);
+      FirebaseHelper.prototype.writeFirebaseOrder(user, favorite);
       return res.json(slackFormat(user, orderPlacedMessage(favorite)));
     }, function() {
       console.log('No favorite for: ' + user);
@@ -65,7 +65,7 @@ Order.prototype.placeOrder = function(user, order, res) {
     // TODO: better way to return if null
     var parsedOrder = parseOrder(user, order, res);
     if (parsedOrder) {
-      writeFirebaseOrder(user, parsedOrder);
+      FirebaseHelper.prototype.writeFirebaseOrder(user, parsedOrder);
       res.json(slackFormat(user, orderPlacedMessage(parsedOrder)));
     }
   }
@@ -75,7 +75,7 @@ Order.prototype.setFavorite = function(user, order, res) {
 
   var parsedOrder = parseOrder(user, order, res);
   if (parsedOrder) {
-    writeFirebaseFavorite(user, parsedOrder);
+    FirebaseHelper.prototype.writeFirebaseFavorite(user, parsedOrder);
     res.json(slackFormat(user, 'Your favorite has been set'));
   }
 }
@@ -251,23 +251,6 @@ function readTodaysFirebaseOrders(args) {
 
 function itemExists(item) {
   return LittleDelhi[item] !== undefined;
-}
-
-function writeFirebaseOrder(user, order) {
-  var date = moment().utcOffset("-07:00").format('MM-DD-YYYY');
-  var writeTo = firebase.child('orders').child(date).child(user);
-  var entry = { order: order };
-
-  writeTo.update(entry, FirebaseHelper.prototype.failureCallback);
-  console.log('Firebase write triggered for ' + user + 's order');
-}
-
-function writeFirebaseFavorite(user, order) {
-  var writeTo = firebase.child('users').child(user);
-  var entry = { favorite: order };
-
-  writeTo.update(entry, FirebaseHelper.prototype.failureCallback);
-  console.log('Firebase write triggered for ' + user + 's favorite');
 }
 
 function noUserInfoWarning(args) {

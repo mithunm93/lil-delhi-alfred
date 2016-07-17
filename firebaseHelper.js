@@ -57,7 +57,7 @@ FirebaseHelper.prototype.readTodaysOrders = function() {
       var orders = snapshot.val();
       args.push(orders)
       callback(args);
-  });
+  }, FirebaseHelper.prototype.failureCallback);
 }
 
 // provide a callback as the first argument that takes arguments like this:
@@ -73,7 +73,24 @@ FirebaseHelper.prototype.getUserInfo = function() {
     var userInfo = shapshot.val();
     args.push(userInfo);
     callback(args);
-  });
+  }, FirebaseHelper.prototype.failureCallback);
+}
+
+FirebaseHelper.prototype.writeFirebaseOrder = function(user, order) {
+  var date = moment().utcOffset("-07:00").format('MM-DD-YYYY');
+  var writeTo = FirebaseHelper.prototype.ref.child('orders').child(date).child(user);
+  var entry = { order: order };
+
+  writeTo.update(entry, FirebaseHelper.prototype.failureCallback);
+  console.log('Firebase write triggered for ' + user + 's order');
+}
+
+FirebaseHelper.prototype.writeFirebaseFavorite = function(user, order) {
+  var writeTo = FirebaseHelper.prototype.ref.child('users').child(user);
+  var entry = { favorite: order };
+
+  writeTo.update(entry, FirebaseHelper.prototype.failureCallback);
+  console.log('Firebase write triggered for ' + user + 's favorite');
 }
 
 module.exports = FirebaseHelper;
