@@ -70,7 +70,7 @@ FirebaseHelper.prototype.getUserInfo = function() {
   console.log('getting user info');
   FirebaseHelper.prototype.ref.child('users').once('value', function(snapshot) {
 
-    var userInfo = shapshot.val();
+    var userInfo = snapshot.val();
     args.push(userInfo);
     callback(args);
   }, FirebaseHelper.prototype.failureCallback);
