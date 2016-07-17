@@ -43,7 +43,7 @@ Order.prototype.readTodaysFirebaseOrders = function(req, res) {
   }
 
   console.log('Received request to get order from authorized sender');
-  FirebaseHelper.prototype.authThenRun(readTodaysFirebaseOrders, res);
+  FirebaseHelper.prototype.authThenRun(prepareMessageForCasper, res);
 };
 
 // Writes to Firebase the order placed by user formatted like so:
@@ -201,23 +201,16 @@ function pickRandomNumberFromOrder(order, userInfo) {
   return userInfo[names[i]].number;
 }
 
-function readTodaysFirebaseOrders(args) {
+function prepareMessageForCasper(args) {
   var res = args[0];
+  var toReturn = { users: [], number: '', items: [] }
 
-  console.log('reading today\'s orders');
-  firebase.child('orders')
-          .child(moment().utcOffset("-07:00").format('MM-DD-YYYY'))
-          .once('value', function(snapshot) {
+  FirebaseHelper.prototype.readTodaysOrders(function(args) {
+    var orders = args[0];
+    if (!orders) return res.json(toReturn);
 
-    var orders = snapshot.val();
-    var toReturn = { users: [], number: '', items: [] }
-
-    if (!orders)
-      return res.json(toReturn);
-
-    console.log('getting user info');
-    firebase.child('users').once('value', function(snapshot) {
-      var userInfo = snapshot.val();
+    FirebaseHelper.prototype.getUserInfo(function(args) {
+      var userInfo = args[0];
 
       console.log(Object.keys(orders).length + ' orders received');
 
@@ -245,8 +238,7 @@ function readTodaysFirebaseOrders(args) {
 
       return res.json(toReturn);
     });
-
-  }, FirebaseHelper.prototype.failureCallback);
+  });
 }
 
 function itemExists(item) {
