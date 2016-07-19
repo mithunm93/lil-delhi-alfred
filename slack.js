@@ -4,6 +4,9 @@ var private = require('./private');
 
 var Slack = {prototype:{}};
 
+// Formats messages like so:
+//  "@<user> <text>"
+// usually used for returning messages to slack through res
 Slack.prototype.slackFormat = function(user, text) {
   var t = '';
   if (user !== null)
@@ -14,12 +17,19 @@ Slack.prototype.slackFormat = function(user, text) {
   return { text: t };
 }
 
+// POSTs messages to slack, this is the incoming webhook portion
+// of the Slack API, the only place from which we initiate Slack
+// messages, the majority of others are simply returned with the
+// request from Slack.
 Slack.prototype.send = function(user, text) {
   var t = Slack.prototype.slackFormat(user, text);
   request.post(private.slack, { body:JSON.stringify(t) });
   console.log('Posted to slack: ' + t.text);
 };
 
+// Pings Slack to inform people that Alfie is taking orders, this
+// is more of a reminder than a hard start for Alfie to start taking
+// orders.
 Slack.prototype.pingSlack = function(req, res) {
   if (req.body.token !== private.slackSecret) {
     console.log("Request does not have proper secret");

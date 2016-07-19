@@ -7,8 +7,10 @@ var tokenGenerator = new FirebaseTokenGenerator(private.firebaseSecret);
 
 var FirebaseHelper = {prototype:{}};
 
+// The reference to Alfie's Firebase
 FirebaseHelper.prototype.ref = new Firebase(private.firebase);
 
+// Generates a new token for authentication with Firebase
 FirebaseHelper.prototype.getNewToken = function() {
   return tokenGenerator.createToken({uid: 'lil-delhi-alfred'});
 };
@@ -76,6 +78,7 @@ FirebaseHelper.prototype.getUserInfo = function() {
   }, FirebaseHelper.prototype.failureCallback);
 }
 
+// Writes the order to Firebase on today's date, under the user's name
 FirebaseHelper.prototype.writeFirebaseOrder = function(user, order) {
   var date = moment().utcOffset("-07:00").format('MM-DD-YYYY');
   var writeTo = FirebaseHelper.prototype.ref.child('orders').child(date).child(user);
@@ -85,6 +88,7 @@ FirebaseHelper.prototype.writeFirebaseOrder = function(user, order) {
   console.log('Firebase write triggered for ' + user + 's order');
 }
 
+// Writes the user's favorite into Firebase
 FirebaseHelper.prototype.writeFirebaseFavorite = function(user, order) {
   var writeTo = FirebaseHelper.prototype.ref.child('users').child(user);
   var entry = { favorite: order };

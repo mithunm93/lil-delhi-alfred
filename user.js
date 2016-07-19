@@ -8,6 +8,7 @@ var User = {prototype: {}};
 var firebase = FirebaseHelper.prototype.ref;
 var slackFormat = Slack.prototype.slackFormat;
 
+// used for "alfred info"
 User.prototype.userInfo = function(user, text, res) {
   if (text === '')
     showInfo(user, res);
@@ -57,6 +58,7 @@ User.prototype.checkFavoriteExistsThenRun = function() {
   });
 }
 
+// Assembles the help message
 User.prototype.help = function(res) {
   var text = Help.alfred;
   text += Help.enterInfo;
@@ -76,6 +78,10 @@ User.prototype.help = function(res) {
 
 // ______________________HELPER METHODS_______________________________
 
+// Shows the user's info, including name, number, and favorite
+// The user needs to have first created a profile with Alfred to
+// be able to access their information, otherwise they need to
+// setInfo
 function showInfo(user, res) {
   User.prototype.checkInfoExistsThenRun(user, function(args) {
     var info = args[0];
@@ -110,6 +116,8 @@ function showInfo(user, res) {
   });
 }
 
+// Sets the user's info including name and number
+// Both of these values must be specified when setting the info
 function setInfo(user, text, res) {
   var u = {};
   text = text.split(',');

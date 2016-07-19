@@ -12,6 +12,8 @@ var Order = {prototype: {}};
 var firebase = FirebaseHelper.prototype.ref;
 var slackFormat = Slack.prototype.slackFormat;
 
+// This method is used by Casper, to post to Slack the status
+// of its order placement.
 Order.prototype.orderComplete = function(req, res) {
   // TODO: make a routes table similar to commands
   if (!(req.body && req.body.token === private.slackSecret)) {
@@ -48,6 +50,8 @@ Order.prototype.readTodaysFirebaseOrders = function(req, res) {
 
 // Writes to Firebase the order placed by user formatted like so:
 // users : { $user : { order : [$order1, $order2, ...] } }
+//
+// Repeated calls from the same user on the same day will overwrite
 Order.prototype.placeOrder = function(user, order, res) {
 
   // placing favorite
@@ -71,6 +75,9 @@ Order.prototype.placeOrder = function(user, order, res) {
   }
 };
 
+// Sets a user's favorite in firebase, this allows the user to simply
+// use "alfred order" to place an order as opposed to typing out their
+// entire order every time.
 Order.prototype.setFavorite = function(user, order, res) {
 
   var parsedOrder = parseOrder(user, order, res);
@@ -98,7 +105,9 @@ Order.prototype.list = function(res) {
   return res.json(slackFormat(null, text));
 }
 
-// Show current order status
+// Show current order status, including items and total price.
+// This is also the message that is shown wheen a user first places
+// their order.
 Order.prototype.status = function(user, res) {
   FirebaseHelper.prototype.readTodaysOrders(function(args) {
     var orders = args[0];
@@ -111,6 +120,10 @@ Order.prototype.status = function(user, res) {
 
 // ______________________HELPER METHODS_______________________________
 
+// formats the order from this:
+// [{"Paneer Makhani" : { spice: "Spicy" }}, {"Naan" : true}]     (Firebase Format)
+//       to this:
+// [["Paneer Makhani", "Spicy"], ["Naan", false]]
 function formatParsedOrder(pOrder) {
   return _.map(pOrder, function (item) {
     name = Object.keys(item)[0];
@@ -119,6 +132,7 @@ function formatParsedOrder(pOrder) {
   });
 }
 
+// Returns the total cost of all the items in the order
 function totalPrice(order) {
   // format for easy use
   fOrder = formatParsedOrder(order);
@@ -130,6 +144,7 @@ function totalPrice(order) {
   return price;
 }
 
+// Creates the message that tells users what they have ordered
 function orderPlacedMessage(order) {
   var text = 'You have ordered ';
 
@@ -155,6 +170,10 @@ function orderPlacedMessage(order) {
   return text;
 }
 
+// Converts the order from human readable:
+// alfred order "paneer makhani (spicy), naan"
+//      to Firebase format:
+// [{"Paneer Makhani" : { spice: "Spicy" }}, {"Naan" : true}]
 function parseOrder(user, order, res) {
   order = order.split(',');
   var toReturn = [];
@@ -191,6 +210,9 @@ function parseOrder(user, order, res) {
   return toReturn;
 }
 
+// This method picks a random phone number from the people that have placed
+// an order and returns it. It is used for picking a person to receive the
+// call for picking up the delivery.
 function pickRandomNumberFromOrder(order, userInfo) {
   var names = Object.keys(order);
   var i = Math.floor(Math.random() * names.length);
@@ -201,6 +223,8 @@ function pickRandomNumberFromOrder(order, userInfo) {
   return userInfo[names[i]].number;
 }
 
+// This method reads the orders from today and gets the user info from Firebase
+// to prepare them to send to Casper.
 function prepareMessageForCasper(args) {
   var res = args[0];
   var toReturn = { users: [], number: '', items: [] }
@@ -241,6 +265,7 @@ function prepareMessageForCasper(args) {
   });
 }
 
+// Checks to see if an item exists in the JSON file
 function itemExists(item) {
   return LittleDelhi[item] !== undefined;
 }
