@@ -44,23 +44,7 @@ FirebaseHelper.prototype.authThenRun = function() {
   }
 }
 
-// provide a callback as the first argument that takes arguments like this:
-//
-//   functionCallback(arguments[1-last, orders])
-FirebaseHelper.prototype.readTodaysOrders = function() {
-  var args = _.toArray(arguments);
-  var callback = args.shift();
-
-  console.log('reading today\'s orders');
-  FirebaseHelper.prototype.ref.child('orders')
-    .child(moment().utcOffset("-07:00").format('MM-DD-YYYY'))
-    .once('value', function(snapshot) {
-
-      var orders = snapshot.val();
-      args.push(orders)
-      callback(args);
-  }, FirebaseHelper.prototype.failureCallback);
-}
+// ----------------------- USER HLPERS --------------------------------
 
 // provide a callback as the first argument that takes arguments like this:
 //
@@ -77,6 +61,8 @@ FirebaseHelper.prototype.getUserInfo = function() {
     callback(args);
   }, FirebaseHelper.prototype.failureCallback);
 }
+
+// --------------------- ORDER HELPERS --------------------------------
 
 // Writes the order to Firebase on today's date, under the user's name
 FirebaseHelper.prototype.writeFirebaseOrder = function(user, order) {
@@ -97,4 +83,21 @@ FirebaseHelper.prototype.writeFirebaseFavorite = function(user, order) {
   console.log('Firebase write triggered for ' + user + 's favorite');
 }
 
+// provide a callback as the first argument that takes arguments like this:
+//
+//   functionCallback(arguments[1-last, orders])
+FirebaseHelper.prototype.readTodaysOrders = function() {
+  var args = _.toArray(arguments);
+  var callback = args.shift();
+
+  console.log('reading today\'s orders');
+  FirebaseHelper.prototype.ref.child('orders')
+    .child(moment().utcOffset("-07:00").format('MM-DD-YYYY'))
+    .once('value', function(snapshot) {
+
+      var orders = snapshot.val();
+      args.push(orders)
+      callback(args);
+  }, FirebaseHelper.prototype.failureCallback);
+}
 module.exports = FirebaseHelper;
