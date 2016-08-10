@@ -46,6 +46,49 @@ FirebaseHelper.prototype.authThenRun = function() {
 
 // ----------------------- USER HLPERS --------------------------------
 
+
+// Checks to see if they user has info stored then executes the callback
+//   FIRST argument must be user to check
+//   SECOND argument must be success callback
+//   THIRD argument must be failure callback
+FirebaseHelper.prototype.checkInfoExistsThenRun = function() {
+  var args = _.toArray(arguments);
+  var user = args.shift();
+  var successCallback = args.shift();
+  var failureCallback = args.shift();
+
+  FirebaseHelper.prototype.ref.child('users').child(user).once('value', function(snapshot) {
+    var info = snapshot.val();
+    if (info) {
+      console.log('User info exists for: ' + user);
+      args.push(info);
+      return successCallback(args);
+    } else
+      return failureCallback(args);
+  });
+}
+
+// Checks to see if they user has info stored then executes the callback
+//   FIRST argument must be user to check
+//   SECOND argument must be success callback
+//   THIRD argument must be failure callback
+FirebaseHelper.prototype.checkFavoriteExistsThenRun = function() {
+  var args = _.toArray(arguments);
+  var user = args.shift();
+  var successCallback = args.shift();
+  var failureCallback = args.shift();
+
+  FirebaseHelper.prototype.ref.child('users').child(user).child('favorite').once('value', function(snapshot) {
+    var favorite = snapshot.val();
+    if (favorite) {
+      console.log('User favorite exists for: ' + user);
+      args.push(favorite);
+      return successCallback(args);
+    } else
+      return failureCallback(args);
+  });
+}
+
 // provide a callback as the first argument that takes arguments like this:
 //
 //   functionCallback(arguments[1-last, userInfo])
@@ -62,6 +105,10 @@ FirebaseHelper.prototype.getUserInfo = function() {
   }, FirebaseHelper.prototype.failureCallback);
 }
 
+FirebaseHelper.prototype.writeFirebaseUser = function(user, info) {
+  FirebaseHelper.prototype.ref.child('users').child(user).update(info);
+  console.log('added ' + user + ': ' + info.name + ', ' + info.number);
+}
 // --------------------- ORDER HELPERS --------------------------------
 
 // Writes the order to Firebase on today's date, under the user's name

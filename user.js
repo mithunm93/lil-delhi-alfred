@@ -16,48 +16,6 @@ User.prototype.userInfo = function(user, text, res) {
     setInfo(user, text, res);
 };
 
-// Checks to see if they user has info stored then executes the callback
-//   FIRST argument must be user to check
-//   SECOND argument must be success callback
-//   THIRD argument must be failure callback
-User.prototype.checkInfoExistsThenRun = function() {
-  var args = _.toArray(arguments);
-  var user = args.shift();
-  var successCallback = args.shift();
-  var failureCallback = args.shift();
-
-  firebase.child('users').child(user).once('value', function(snapshot) {
-    var info = snapshot.val();
-    if (info) {
-      console.log('User info exists for: ' + user);
-      args.push(info);
-      return successCallback(args);
-    } else
-      return failureCallback(args);
-  });
-}
-
-// Checks to see if they user has info stored then executes the callback
-//   FIRST argument must be user to check
-//   SECOND argument must be success callback
-//   THIRD argument must be failure callback
-User.prototype.checkFavoriteExistsThenRun = function() {
-  var args = _.toArray(arguments);
-  var user = args.shift();
-  var successCallback = args.shift();
-  var failureCallback = args.shift();
-
-  firebase.child('users').child(user).child('favorite').once('value', function(snapshot) {
-    var favorite = snapshot.val();
-    if (favorite) {
-      console.log('User favorite exists for: ' + user);
-      args.push(favorite);
-      return successCallback(args);
-    } else
-      return failureCallback(args);
-  });
-}
-
 // Assembles the help message
 User.prototype.help = function(res) {
   var text = Help.alfred;
@@ -83,7 +41,7 @@ User.prototype.help = function(res) {
 // be able to access their information, otherwise they need to
 // setInfo
 function showInfo(user, res) {
-  User.prototype.checkInfoExistsThenRun(user, function(args) {
+  FirebaseHelper.prototype.checkInfoExistsThenRun(user, function(args) {
     var info = args[0];
 
     var text = '```';
@@ -156,8 +114,7 @@ function setInfo(user, text, res) {
 
   u.number = number;
 
-  firebase.child('users').child(user).update(u);
-  console.log('added ' + first + ' ' + last + ', ' + number + ' to ' + user);
+  FirebaseHelper.prototype.writeFirebaseUser(user, u);
 
   return res.json(slackFormat(user, 'Thank you for the info'));
 }

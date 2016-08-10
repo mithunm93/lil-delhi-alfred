@@ -35,7 +35,7 @@ function commands(args) {
     // optional spice level after name (defaults to mild on seamless) _____________|   |
     // comma separated ________________________________________________________________|
 
-    User.prototype.checkInfoExistsThenRun(user, function(){
+    FirebaseHelper.prototype.checkInfoExistsThenRun(user, function(){
       Order.prototype.placeOrder(user, message, res);
     }, function() {noUserInfoWarning(user, res)});
   } else if (text.indexOf('info') !== -1) {
@@ -75,7 +75,7 @@ function commands(args) {
     //
     // If nothing is specified in quotes, return the user's stored favorite
 
-    User.prototype.checkInfoExistsThenRun(user, function(){
+    FirebaseHelper.prototype.checkInfoExistsThenRun(user, function(){
       Order.prototype.setFavorite(user, message, res);
     }, function() {noUserInfoWarning(user, res)});
   } else if (text.indexOf('list') !== -1) {
@@ -107,7 +107,7 @@ function commands(args) {
     //                                              ^
     // 'status' to indicate status request _________|
 
-    User.prototype.checkInfoExistsThenRun(user, function(){
+    FirebaseHelper.prototype.checkInfoExistsThenRun(user, function(){
       Order.prototype.status(user, res);
     }, function() {noUserInfoWarning(user, res)});
   } else {

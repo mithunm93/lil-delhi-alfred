@@ -56,7 +56,7 @@ Order.prototype.placeOrder = function(user, uOrder, res) {
 
   // placing favorite
   if (uOrder === '') {
-    User.prototype.checkFavoriteExistsThenRun(user, function(args) {
+    FirebaseHelper.prototype.checkFavoriteExistsThenRun(user, function(args) {
       console.log('Favorite received for: ' + user);
       var favorite = args[0];
       FirebaseHelper.prototype.writeFirebaseOrder(user, favorite);
