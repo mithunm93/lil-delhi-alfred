@@ -52,10 +52,10 @@ Order.prototype.readTodaysFirebaseOrders = function(req, res) {
 // users : { $user : { order : [$order1, $order2, ...] } }
 //
 // Repeated calls from the same user on the same day will overwrite
-Order.prototype.placeOrder = function(user, order, res) {
+Order.prototype.placeOrder = function(user, uOrder, res) {
 
   // placing favorite
-  if (order === '') {
+  if (uOrder === '') {
     User.prototype.checkFavoriteExistsThenRun(user, function(args) {
       console.log('Favorite received for: ' + user);
       var favorite = args[0];
@@ -67,10 +67,10 @@ Order.prototype.placeOrder = function(user, order, res) {
     });
   } else {
     // TODO: better way to return if null
-    var parsedOrder = parseOrder(user, order, res);
-    if (parsedOrder) {
-      FirebaseHelper.prototype.writeFirebaseOrder(user, parsedOrder);
-      res.json(slackFormat(user, orderPlacedMessage(parsedOrder)));
+    var fOrder = userToFirebaseFormat(user, uOrder, res);
+    if (fOrder) {
+      FirebaseHelper.prototype.writeFirebaseOrder(user, fOrder);
+      res.json(slackFormat(user, orderPlacedMessage(fOrder)));
     }
   }
 };
@@ -78,11 +78,11 @@ Order.prototype.placeOrder = function(user, order, res) {
 // Sets a user's favorite in firebase, this allows the user to simply
 // use "alfred order" to place an order as opposed to typing out their
 // entire order every time.
-Order.prototype.setFavorite = function(user, order, res) {
+Order.prototype.setFavorite = function(user, uOrder, res) {
 
-  var parsedOrder = parseOrder(user, order, res);
-  if (parsedOrder) {
-    FirebaseHelper.prototype.writeFirebaseFavorite(user, parsedOrder);
+  var fOrder = userToFirebaseFormat(user, uOrder, res);
+  if (fOrder) {
+    FirebaseHelper.prototype.writeFirebaseFavorite(user, fOrder);
     res.json(slackFormat(user, 'Your favorite has been set'));
   }
 }
@@ -110,11 +110,11 @@ Order.prototype.list = function(res) {
 // their order.
 Order.prototype.status = function(user, res) {
   FirebaseHelper.prototype.readTodaysOrders(function(args) {
-    var orders = args[0];
-    if (!orders || !orders[user])
+    var fOrders = args[0];
+    if (!fOrders || !fOrders[user])
       return res.json(slackFormat(user, Errors.NO_ORDER_TEXT));
     else
-      return res.json(slackFormat(user, orderPlacedMessage(orders[user].order)));
+      return res.json(slackFormat(user, orderPlacedMessage(fOrders[user].order)));
   });
 }
 
@@ -124,8 +124,8 @@ Order.prototype.status = function(user, res) {
 // [{"Paneer Makhani" : { spice: "Spicy" }}, {"Naan" : true}]     (Firebase Format)
 //       to this:
 // [["Paneer Makhani", "Spicy"], ["Naan", false]]
-function formatParsedOrder(pOrder) {
-  return _.map(pOrder, function (item) {
+function firebaseToArrayFormat(fOrder) {
+  return _.map(fOrder, function (item) {
     name = Object.keys(item)[0];
     spice = item[name]['spice'] || false;
     return [name, spice];
@@ -133,40 +133,40 @@ function formatParsedOrder(pOrder) {
 }
 
 // Returns the total cost of all the items in the order
-function totalPrice(order) {
+function totalPrice(fOrder) {
   // format for easy use
-  fOrder = formatParsedOrder(order);
+  aOrder = firebaseToArrayFormat(fOrder);
 
   price = 0;
-  for (var i = 0; i < fOrder.length; i++)
-    price += LittleDelhi["reversed"][fOrder[i][0]]['price'];
+  for (var i = 0; i < aOrder.length; i++)
+    price += LittleDelhi["reversed"][aOrder[i][0]]['price'];
 
   return price;
 }
 
 // Creates the message that tells users what they have ordered
-function orderPlacedMessage(order) {
+function orderPlacedMessage(fOrder) {
   var text = 'You have ordered ';
 
   // format for easy use
-  fOrder = formatParsedOrder(order);
+  aOrder = firebaseToArrayFormat(fOrder);
 
   // if more than one item, make a list
-  for (var i = 0; i < fOrder.length -1; i++) {
-    text += fOrder[i][0];
-    if (fOrder[i][1])
-      text += '(' + fOrder[i][1] + ')';
+  for (var i = 0; i < aOrder.length -1; i++) {
+    text += aOrder[i][0];
+    if (aOrder[i][1])
+      text += '(' + aOrder[i][1] + ')';
     text += ', ';
   }
 
-  if (order.length > 1)
+  if (aOrder.length > 1)
     text += 'and ';
 
-  text += _.last(fOrder)[0]
-  if (_.last(fOrder)[1])
-    text += '(' +  _.last(fOrder)[1] + ')';
+  text += _.last(aOrder)[0]
+  if (_.last(aOrder)[1])
+    text += '(' +  _.last(aOrder)[1] + ')';
 
-  text += '. $' + totalPrice(order) + ' is your order total.';
+  text += '. $' + totalPrice(fOrder) + ' is your order total.';
   return text;
 }
 
@@ -174,11 +174,11 @@ function orderPlacedMessage(order) {
 // alfred order "paneer makhani (spicy), naan"
 //      to Firebase format:
 // [{"Paneer Makhani" : { spice: "Spicy" }}, {"Naan" : true}]
-function parseOrder(user, order, res) {
-  order = order.split(',');
+function userToFirebaseFormat(user, uOrder, res) {
+  uOrder = uOrder.split(',');
   var toReturn = [];
 
-  for (item of order) {
+  for (item of uOrder) {
     // leading space
     if (item[0] === ' ')
       item = item.substring(1, item.length);
@@ -213,8 +213,8 @@ function parseOrder(user, order, res) {
 // This method picks a random phone number from the people that have placed
 // an order and returns it. It is used for picking a person to receive the
 // call for picking up the delivery.
-function pickRandomNumberFromOrder(order, userInfo) {
-  var names = Object.keys(order);
+function pickRandomNumberFromOrder(fOrder, userInfo) {
+  var names = Object.keys(fOrder);
   var i = Math.floor(Math.random() * names.length);
 
   Slack.prototype.send(names[i], 'You will receive the call to pick up the order');
@@ -230,17 +230,17 @@ function prepareMessageForCasper(args) {
   var toReturn = { users: [], number: '', items: [] }
 
   FirebaseHelper.prototype.readTodaysOrders(function(args) {
-    var orders = args[0];
-    if (!orders) return res.json(toReturn);
+    var fOrders = args[0];
+    if (!fOrders) return res.json(toReturn);
 
     FirebaseHelper.prototype.getUserInfo(function(args) {
       var userInfo = args[0];
 
-      console.log(Object.keys(orders).length + ' orders received');
+      console.log(Object.keys(fOrders).length + ' orders received');
 
       // o is the 'user_name' in the data structured like this:
       //   user_name : [ {order1: true}, {order2: {spice: 'spicy'}}, ... ]
-      for (o in orders) {
+      for (o in fOrders) {
         if (!userInfo[o]) {
           console.log(o + ' has no information stored! Skipping their order');
           continue;
@@ -254,11 +254,11 @@ function prepareMessageForCasper(args) {
         //   { order1: true }
         //         OR
         //   { order2: {spice: 'spicy'}}
-        for (i of orders[o].order)
+        for (i of fOrders[o].order)
           toReturn.items.push(i);
       }
 
-      toReturn.number = pickRandomNumberFromOrder(orders, userInfo);
+      toReturn.number = pickRandomNumberFromOrder(fOrders, userInfo);
 
       return res.json(toReturn);
     });
