@@ -192,6 +192,7 @@ function orderPlacedMessage(fOrder) {
 function userToFirebaseFormat(user, uOrder, res) {
   uOrder = uOrder.split(',');
   var toReturn = [];
+  var invalidMessages = [];
 
   for (item of uOrder) {
     // leading space
@@ -213,7 +214,21 @@ function userToFirebaseFormat(user, uOrder, res) {
     }
 
     if (itemExists(name)) {
-      toPush[LittleDelhi[name].name] = (spice === '') ? true : { spice: LittleDelhi.spices[spice] };
+      var hasSpice = itemHasSpiceOptions(name);
+      var value = '';
+
+      // We tell the user if they entered an item with a spice level when
+      // that item actually doesn't have a spice level. We still place the
+      // order, and the user knows this because "toReturn" is parsed back
+      // into Firebase terminology and returned to slack after this method.
+      if (hasSpice && spice !== '')
+        value = { spice: LittleDelhi.spices[spice] };
+      else {
+        if (!hasSpice)
+          invalidMessages.push(name + Errors.NO_SPICE_OPTION_TEXT);
+        value = true;
+      }
+      toPush[LittleDelhi[name].name] = value;
       toReturn.push(toPush);
     } else {
       console.log('Invalid item: ' + name);
@@ -221,6 +236,10 @@ function userToFirebaseFormat(user, uOrder, res) {
       return;
     }
   }
+
+  // inform the user of any errors with their order
+  if (invalidMessages.length !== 0)
+    Slack.prototype.send(user, invalidMessages.join(', '));
 
   return toReturn;
 }
@@ -284,6 +303,11 @@ function prepareMessageForCasper(args) {
 // Checks to see if an item exists in the JSON file
 function itemExists(item) {
   return LittleDelhi[item] !== undefined;
+}
+
+// Checks to see if the item exists and has spice options
+function itemHasSpiceOptions(item) {
+  return itemExists(item) && (LittleDelhi[item]["spiceOptions"] === true);
 }
 
 module.exports = Order;

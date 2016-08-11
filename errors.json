@@ -3,6 +3,7 @@
   "UNAUTHORIZED_ACCESS" : "Improper token received",
 
   "INVALID_ORDER_TEXT" : " is not a valid Little Delhi item. Use: 'alfred list' to see the list of valid items",
+  "NO_SPICE_OPTION_TEXT" : " does not have a spice option",
   "NO_INFO_TEXT" : " you have not registered your name and number yet. Use: alfred info \"<FIRST> <LAST>, ##########\", to set your name and number",
   "NO_FAVORITE_TEXT" : " you have not set a favorite yet. Use: alfred favorite \"<order1>, <order2>, ...\"",
   "NO_ORDER_TEXT" : " you have not placed an order today.",
