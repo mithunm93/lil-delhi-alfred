@@ -109,6 +109,11 @@ FirebaseHelper.prototype.writeFirebaseUser = function(user, info) {
   FirebaseHelper.prototype.ref.child('users').child(user).update(info);
   console.log('added ' + user + ': ' + info.name + ', ' + info.number);
 }
+
+// Removes the user's info, including favorite
+FirebaseHelper.prototype.removeFirebaseUser = function(user, callback) {
+  FirebaseHelper.prototype.ref.child('users').child(user).remove(callback);
+}
 // --------------------- ORDER HELPERS --------------------------------
 
 // Checks to see if the user has placed an order today then executes the callback

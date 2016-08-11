@@ -16,6 +16,24 @@ User.prototype.userInfo = function(user, text, res) {
     setInfo(user, text, res);
 };
 
+// Removes the user's info from Firebase, including their favorite
+User.prototype.forgetInfo = function(user, res) {
+  FirebaseHelper.prototype.checkInfoExistsThenRun(user, function(args) {
+    FirebaseHelper.prototype.removeFirebaseUser(user, function(error) {
+      if (error) {
+        console.log("ERROR forgetting user info: " + error);
+        return res.json(slackFormat(user, "Something went wrong when trying to remove your info"));
+      } else {
+        console.log("User " + user + "'s information has been removed'");
+        return res.json(slackFormat(user, "Your info has been removed"));
+      }
+    });
+  }, function() {
+    console.log('No info exists for: ' + user);
+    return res.json(slackFormat(user, 'No info exists for you'));
+  });
+}
+
 // Assembles the help message
 User.prototype.help = function(res) {
   var text = Help.alfred;

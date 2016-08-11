@@ -258,6 +258,7 @@ function prepareMessageForCasper(args) {
       for (o in fOrders) {
         if (!userInfo[o]) {
           console.log(o + ' has no information stored! Skipping their order');
+          delete fOrders[o];
           continue;
         }
 

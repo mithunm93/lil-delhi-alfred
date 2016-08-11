@@ -54,22 +54,35 @@ function commands(args) {
   } else if (text.indexOf('info') !== -1) {
     // check if info set request
 
-    // Format of info set should be like so:
-    //
-    //                                            alfred my info is "John Smith, 0123456789"
-    //                                                       ^         ^    ^  ^     ^
-    // 'name' to indicate setting your name _________________|         |    |  |     |
-    // first name _____________________________________________________|    |  |     |
-    // last name ___________________________________________________________|  |     |
-    // comma separated ________________________________________________________|     |
-    // strictly numeric phone number ________________________________________________|
-    //
-    //
-    // ____________________ OR __________________________
-    //
-    // If nothing is specified in quotes, return the user's stored info
+    if (text.indexOf('forget') !== -1) {
+      // are they asking Alfie to forget?
 
-    User.prototype.userInfo(user, message, res);
+      // Format order forget request should be like so:
+      //
+      //                                    alfred forget info
+      //                                             ^     ^
+      // indicating intent to forget ________________|     |
+      // specifying we want to forget info ________________|
+
+      User.prototype.forgetInfo(user, res);
+    } else {
+      // Format of info set should be like so:
+      //
+      //                                            alfred my info is "John Smith, 0123456789"
+      //                                                       ^         ^    ^  ^     ^
+      // 'name' to indicate setting your name _________________|         |    |  |     |
+      // first name _____________________________________________________|    |  |     |
+      // last name ___________________________________________________________|  |     |
+      // comma separated ________________________________________________________|     |
+      // strictly numeric phone number ________________________________________________|
+      //
+      //
+      // ____________________ OR __________________________
+      //
+      // If nothing is specified in quotes, return the user's stored info
+
+      User.prototype.userInfo(user, message, res);
+    }
   } else if (text.indexOf('favorite') !== -1) {
     // check if favorite set request
 
