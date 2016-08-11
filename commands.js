@@ -25,19 +25,32 @@ function commands(args) {
   if (text.indexOf('order') !== -1) {
     // check if order request
 
-    // Format of order request should be like so:
-    //
-    //                                              alfred order "butter chicken(spicy), mango lassi, garlic naan"
-    //                                                ^     ^             ^        ^   ^
-    // 'alfred' slack trigger ________________________|     |             |        |   |
-    // 'order' to indicate placing order ___________________|             |        |   |
-    // name of food surrounded in quotes _________________________________|        |   |
-    // optional spice level after name (defaults to mild on seamless) _____________|   |
-    // comma separated ________________________________________________________________|
+    if (text.indexOf('forget') !== -1) {
+      // are they asking Alfie to forget?
 
-    FirebaseHelper.prototype.checkInfoExistsThenRun(user, function(){
-      Order.prototype.placeOrder(user, message, res);
-    }, function() {noUserInfoWarning(user, res)});
+      // Format order forget request should be like so:
+      //
+      //                                    alfred forget order
+      //                                             ^     ^
+      // indicating intent to forget ________________|     |
+      // specifying we want to forget order _______________|
+
+      Order.prototype.forgetOrder(user, res);
+    } else {
+      // Format of order request should be like so:
+      //
+      //                                              alfred order "butter chicken(spicy), mango lassi, garlic naan"
+      //                                                ^     ^             ^        ^   ^
+      // 'alfred' slack trigger ________________________|     |             |        |   |
+      // 'order' to indicate placing order ___________________|             |        |   |
+      // name of food surrounded in quotes _________________________________|        |   |
+      // optional spice level after name (defaults to mild on seamless) _____________|   |
+      // comma separated ________________________________________________________________|
+
+      FirebaseHelper.prototype.checkInfoExistsThenRun(user, function(){
+        Order.prototype.placeOrder(user, message, res);
+      }, function() {noUserInfoWarning(user, res)});
+    }
   } else if (text.indexOf('info') !== -1) {
     // check if info set request
 
@@ -110,6 +123,18 @@ function commands(args) {
     FirebaseHelper.prototype.checkInfoExistsThenRun(user, function(){
       Order.prototype.status(user, res);
     }, function() {noUserInfoWarning(user, res)});
+  } else if (text.indexOf('forget') !== -1) {
+    // are they asking Alfie to forget the order?
+    // this would be easier than typing out "alfie forget order" every
+    //   time they want to cancel an order
+
+    // Format order forget request should be like so:
+    //
+    //                                    alfred forget
+    //                                             ^
+    // indicating intent to forget order __________|
+
+    Order.prototype.forgetOrder(user, res);
   } else {
     // no valid terms were used
 

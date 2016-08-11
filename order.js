@@ -118,6 +118,21 @@ Order.prototype.status = function(user, res) {
   });
 }
 
+// Forget the user's order from today
+Order.prototype.forgetOrder = function(user, res) {
+  FirebaseHelper.prototype.checkOrderExistsThenRun(user, function(){
+    // order exsits, we need to delete it
+    FirebaseHelper.prototype.removeFirebaseOrder(user, function(error) {
+      if (error)
+        return res.json(slackFormat(user, "Something went wrong when trying to remove your order"));
+      else
+        return res.json(slackFormat(user, "Your order has been removed"));
+    });
+  }, function() {
+    // order doesn't exist
+      return res.json(slackFormat(user, Errors.NO_ORDER_TEXT));
+  });
+}
 // ______________________HELPER METHODS_______________________________
 
 // formats the order from this:

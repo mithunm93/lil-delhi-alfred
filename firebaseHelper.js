@@ -111,6 +111,35 @@ FirebaseHelper.prototype.writeFirebaseUser = function(user, info) {
 }
 // --------------------- ORDER HELPERS --------------------------------
 
+// Checks to see if the user has placed an order today then executes the callback
+//   FIRST argument must be user to check
+//   SECOND argument must be success callback
+//   THIRD argument must be failure callback
+FirebaseHelper.prototype.checkOrderExistsThenRun = function() {
+  var args = _.toArray(arguments);
+  var user = args.shift();
+  var successCallback = args.shift();
+  var failureCallback = args.shift();
+
+  FirebaseHelper.prototype.ref.child('orders')
+    .child(moment().utcOffset("-07:00").format('MM-DD-YYYY'))
+    .child(user).once('value', function(snapshot) {
+    if (snapshot.exists()) {
+      console.log('order exists for: ' + user);
+      args.push(snapshot.val());
+      return successCallback(args);
+    } else
+      console.log('No order for: ' + user);
+      return failureCallback(args);
+  });
+}
+
+// Removes the order that the user has placed today
+FirebaseHelper.prototype.removeFirebaseOrder = function(user, callback) {
+  FirebaseHelper.prototype.ref.child('orders')
+    .child(moment().utcOffset("-07:00").format('MM-DD-YYYY'))
+    .child(user).remove(callback);
+}
 // Writes the order to Firebase on today's date, under the user's name
 FirebaseHelper.prototype.writeFirebaseOrder = function(user, order) {
   var date = moment().utcOffset("-07:00").format('MM-DD-YYYY');
