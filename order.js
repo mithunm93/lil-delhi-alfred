@@ -221,11 +221,13 @@ function userToFirebaseFormat(user, uOrder, res) {
       // that item actually doesn't have a spice level. We still place the
       // order, and the user knows this because "toReturn" is parsed back
       // into Firebase terminology and returned to slack after this method.
-      if (hasSpice && spice !== '')
+      if (hasSpice && spice !== '' && spiceExists(spice))
         value = { spice: LittleDelhi.spices[spice] };
       else {
         if (!hasSpice)
           invalidMessages.push(name + Errors.NO_SPICE_OPTION_TEXT);
+        else if (!spiceExists(spice) && spice !== '')
+          invalidMessages.push(spice + Errors.INVALID_SPICE_OPTION_TEXT);
         value = true;
       }
       toPush[LittleDelhi[name].name] = value;
@@ -308,6 +310,11 @@ function itemExists(item) {
 // Checks to see if the item exists and has spice options
 function itemHasSpiceOptions(item) {
   return itemExists(item) && (LittleDelhi[item]["spiceOptions"] === true);
+}
+
+// checks to see if the spice given is valid
+function spiceExists(spice) {
+  return LittleDelhi.spices[spice] !== undefined;
 }
 
 module.exports = Order;
