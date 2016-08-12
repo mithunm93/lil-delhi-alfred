@@ -295,11 +295,44 @@ function prepareMessageForCasper(args) {
           toReturn.items.push(i);
       }
 
+      var newItems = fillOrders(toReturn.items);
+      toReturn.items = toReturn.items.concat(newItems);
+
       toReturn.number = pickRandomNumberFromOrder(fOrders, userInfo);
 
       return res.json(toReturn);
     });
   });
+}
+
+// Creates the text for new items added to the order
+function newItemsText(newItems) {
+  var text = 'The minimum of $20 was not met, so these items were added: ';
+
+  itemsText = _.map(firebaseToArrayFormat(newItems), _.first).join(', ');
+
+  return (text + itemsText);
+}
+
+// If the total price is below $17, automatically fill with samosas and
+// mango lassis until we hit that price, because the order can't be placed
+// below that. $20 is the limit, but $17 with tax and tip comes up to $20.
+function fillOrders(items) {
+  var price = totalPrice(items);
+  var newItems = [];
+
+  while (price < 17) {
+    var name = (Math.random() >= .33) ? 'Samosa' : 'Mango Lassi';
+    var item = {}
+    item[name] = true;
+    newItems.push(item);
+    price += LittleDelhi["reversed"][name]['price'];
+  }
+
+  if (newItems.length > 0)
+    Slack.prototype.send('here', newItemsText(newItems));
+
+  return newItems;
 }
 
 // Checks to see if an item exists in the JSON file
