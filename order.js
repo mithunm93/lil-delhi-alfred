@@ -54,25 +54,30 @@ Order.prototype.readTodaysFirebaseOrders = function(req, res) {
 // Repeated calls from the same user on the same day will overwrite
 Order.prototype.placeOrder = function(user, uOrder, res) {
 
-  // placing favorite
-  if (uOrder === '') {
-    FirebaseHelper.prototype.checkFavoriteExistsThenRun(user, function(args) {
-      console.log('Favorite received for: ' + user);
-      var favorite = args[0];
-      FirebaseHelper.prototype.writeFirebaseOrder(user, favorite);
-      return res.json(slackFormat(user, orderPlacedMessage(favorite)));
-    }, function() {
-      console.log('No favorite for: ' + user);
-      return res.json(slackFormat(user, Errors.NO_FAVORITE_TEXT));
-    });
-  } else {
-    // TODO: better way to return if null
-    var fOrder = userToFirebaseFormat(user, uOrder, res);
-    if (fOrder) {
-      FirebaseHelper.prototype.writeFirebaseOrder(user, fOrder);
-      res.json(slackFormat(user, orderPlacedMessage(fOrder)));
+  FirebaseHelper.prototype.checkOrderNotPlacedThenRun(function () {
+    // placing favorite
+    if (uOrder === '') {
+      FirebaseHelper.prototype.checkFavoriteExistsThenRun(user, function(args) {
+        console.log('Favorite received for: ' + user);
+        var favorite = args[0];
+        FirebaseHelper.prototype.writeFirebaseOrder(user, favorite);
+        return res.json(slackFormat(user, orderPlacedMessage(favorite)));
+      }, function() {
+        console.log('No favorite for: ' + user);
+        return res.json(slackFormat(user, Errors.NO_FAVORITE_TEXT));
+      });
+    } else {
+      // TODO: better way to return if null
+      var fOrder = userToFirebaseFormat(user, uOrder, res);
+      if (fOrder) {
+        FirebaseHelper.prototype.writeFirebaseOrder(user, fOrder);
+        res.json(slackFormat(user, orderPlacedMessage(fOrder)));
+      }
     }
-  }
+  }, function () {
+    // order already placed for today
+    return res.json(slackFormat(user, Errors.ORDER_ALREADY_PLACED_TEXT));
+  });
 };
 
 // Sets a user's favorite in firebase, this allows the user to simply
@@ -267,7 +272,10 @@ function prepareMessageForCasper(args) {
 
   FirebaseHelper.prototype.readTodaysOrders(function(args) {
     var fOrders = args[0];
-    if (!fOrders) return res.json(toReturn);
+    if (!fOrders) {
+      FirebaseHelper.prototype.writeFirebaseRead();
+      return res.json(toReturn);
+    }
 
     FirebaseHelper.prototype.getUserInfo(function(args) {
       var userInfo = args[0];
@@ -300,6 +308,7 @@ function prepareMessageForCasper(args) {
 
       toReturn.number = pickRandomNumberFromOrder(fOrders, userInfo);
 
+      FirebaseHelper.prototype.writeFirebaseRead();
       return res.json(toReturn);
     });
   });

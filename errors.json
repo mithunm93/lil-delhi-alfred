@@ -9,5 +9,6 @@
   "NO_FAVORITE_TEXT" : " you have not set a favorite yet. Use: alfred favorite \"<order1>, <order2>, ...\"",
   "NO_ORDER_TEXT" : " you have not placed an order today.",
 
-  "INVALID_INFO_TEXT" : " is invalid. Your command must be formatted as such: alfred info \"<FIRST> <LAST>, ##########\""
+  "INVALID_INFO_TEXT" : " is invalid. Your command must be formatted as such: alfred info \"<FIRST> <LAST>, ##########\"",
+  "ORDER_ALREADY_PLACED_TEXT" : " the order has already been placed today, your order has not been submitted"
 }

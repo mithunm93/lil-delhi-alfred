@@ -7,6 +7,8 @@ var tokenGenerator = new FirebaseTokenGenerator(private.firebaseSecret);
 
 var FirebaseHelper = {prototype:{}};
 
+const ALREADY_PLACED_TEXT = 'already_placed'
+
 // The reference to Alfie's Firebase
 FirebaseHelper.prototype.ref = new Firebase(private.firebase);
 
@@ -115,6 +117,38 @@ FirebaseHelper.prototype.removeFirebaseUser = function(user, callback) {
   FirebaseHelper.prototype.ref.child('users').child(user).remove(callback);
 }
 // --------------------- ORDER HELPERS --------------------------------
+
+// Checks to see if the order has already been handed off to Casper for today
+//   FIRST argument must be success callback (order not placed)
+//   SECOND argument must be failure callback
+FirebaseHelper.prototype.checkOrderNotPlacedThenRun = function() {
+  var args = _.toArray(arguments);
+  var successCallback = args.shift();
+  var failureCallback = args.shift();
+
+  FirebaseHelper.prototype.readTodaysOrders(function(args) {
+    var orders = args[0];
+
+    if (orders[ALREADY_PLACED_TEXT] === undefined) {
+      console.log('Order not yet placed today');
+      return successCallback(args);
+    } else {
+      console.log('Order already placed today');
+      return failureCallback(args);
+    }
+  });
+}
+
+// Write into Firebase that today's orders have already been placed
+FirebaseHelper.prototype.writeFirebaseRead = function() {
+  var date = moment().utcOffset("-07:00").format('MM-DD-YYYY');
+  var writeTo = FirebaseHelper.prototype.ref.child('orders').child(date);
+  var entry = {}
+  entry[ALREADY_PLACED_TEXT] = true
+
+  writeTo.update(entry, FirebaseHelper.prototype.failureCallback);
+  console.log('Firebase write triggered for today\'s orders placed');
+}
 
 // Checks to see if the user has placed an order today then executes the callback
 //   FIRST argument must be user to check
