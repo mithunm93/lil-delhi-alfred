@@ -51,7 +51,7 @@ function commands(args) {
         Order.prototype.placeOrder(user, message, res);
       }, function() {noUserInfoWarning(user, res)});
     }
-  } else if (text.indexOf('info') !== -1) {
+  } else if (text.indexOf('info') !== -1 || text.indexOf('who dis')) {
     // check if info set request
 
     if (text.indexOf('forget') !== -1) {
