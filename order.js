@@ -224,9 +224,9 @@ function userToFirebaseFormat(user, uOrder, res) {
       if (hasSpice && spice !== '' && spiceExists(spice))
         value = { spice: LittleDelhi.spices[spice] };
       else {
-        if (!hasSpice)
+        if (spice !== '' && !hasSpice)
           invalidMessages.push(name + Errors.NO_SPICE_OPTION_TEXT);
-        else if (!spiceExists(spice) && spice !== '')
+        else if (spice !== '' && !spiceExists(spice))
           invalidMessages.push(spice + Errors.INVALID_SPICE_OPTION_TEXT);
         value = true;
       }
