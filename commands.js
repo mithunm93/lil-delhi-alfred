@@ -4,6 +4,7 @@ var Errors = require('./errors');
 var private = require('./private');
 var Order = require('./order.js');
 var User = require('./user.js');
+var Alfie = require('./alfie.js');
 var firebase = FirebaseHelper.prototype.ref;
 var slackFormat = Slack.prototype.slackFormat;
 
@@ -148,7 +149,17 @@ function commands(args) {
     // indicating intent to forget order __________|
 
     Order.prototype.forgetOrder(user, res);
-  } else {
+  } else if (text.indexOf('thank') !== -1) {
+    // respond to thanking alfie
+
+    // Format of thanking should be like so:
+    //
+    //                                    alfred thanks
+    //                                             ^
+    // indicating intent to thank alfie ___________|
+
+    Alfie.prototype.thank(user, res);
+  }else {
     // no valid terms were used
 
     return res.json(slackFormat(user, Errors.INVALID_COMMAND_TEXT));
