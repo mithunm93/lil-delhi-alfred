@@ -309,6 +309,8 @@ function prepareMessageForCasper(args) {
       toReturn.number = pickRandomNumberFromOrder(fOrders, userInfo);
 
       FirebaseHelper.prototype.writeFirebaseRead();
+
+      console.log(JSON.stringify(toReturn));
       return res.json(toReturn);
     });
   });
