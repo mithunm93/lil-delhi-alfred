@@ -129,7 +129,7 @@ FirebaseHelper.prototype.checkOrderNotPlacedThenRun = function() {
   FirebaseHelper.prototype.readTodaysOrders(function(args) {
     var orders = args[0];
 
-    if (orders[ALREADY_PLACED_TEXT] === undefined) {
+    if (!orders || orders[ALREADY_PLACED_TEXT] === undefined) {
       console.log('Order not yet placed today');
       return successCallback(args);
     } else {
