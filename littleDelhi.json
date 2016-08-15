@@ -97,7 +97,7 @@
 
   "reversed" : {
     "Aloo Tikki": { "name": "aloo tikki", "price": 4.5 },
-    "vegetable pakora": { "name": "vegetable pakora", "price": 3.99 },
+    "Vegetable Pakora": { "name": "vegetable pakora", "price": 3.99 },
     "Assorted Tandoori Platter": { "name": "assorted tandoori platter", "price": 9.99 },
     "Paneer Chili": { "name": "paneer chili", "price": 8.99 },
     "Samosa": { "name": "samosa", "price": 4.5 },
