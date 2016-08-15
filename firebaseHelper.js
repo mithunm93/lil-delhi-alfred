@@ -215,4 +215,23 @@ FirebaseHelper.prototype.readTodaysOrders = function() {
       callback(args);
   }, FirebaseHelper.prototype.failureCallback);
 }
+
+// Read all the orders in Firebase
+//
+// provide a callback as the first argument that takes arguments like this:
+//
+//   functionCallback(arguments[1-last, orders])
+FirebaseHelper.prototype.readAllOrders = function() {
+  var args = _.toArray(arguments);
+  var callback = args.shift();
+
+  console.log('reading all orders');
+  FirebaseHelper.prototype.ref.child('orders')
+    .once('value', function(snapshot) {
+
+      var orders = snapshot.val();
+      args.push(orders)
+      callback(args);
+  }, FirebaseHelper.prototype.failureCallback);
+}
 module.exports = FirebaseHelper;
