@@ -8,8 +8,8 @@ Alfie.prototype.thank = function(user, res) {
   return res.json(slackFormat(user, "you're welcome"));
 }
 
-// Assembles the help message
-Alfie.prototype.help = function(res) {
+// Assembles the full help message
+Alfie.prototype.fullHelp = function(res) {
   var text = Help.alfred;
   text += Help.enterInfo;
   text += Help.placeOrder;
@@ -18,11 +18,14 @@ Alfie.prototype.help = function(res) {
   text += Help.extraActions;
   text += Help.favorite;
   text += Help.list;
+  text += Help.forget;
+  text += Help.stats;
   text += Help.showInfo;
   text += Help.orderFavorite;
+  text += Help.thank;
   text += Help.help;
 
-  console.log('Printed help text');
+  console.log('Printed full help text');
   return res.json(slackFormat(null, text));
 }
 module.exports = Alfie;
