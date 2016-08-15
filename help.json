@@ -9,6 +9,7 @@
   "favorite" : " - Set a favorite list of items so that you don't have to specify your order each time: ```alfred favorite \"butter chicken (spicy), mango lassi, samosa\"``` You can then place future orders with just `alfred order`. You can see your current favorite items by using `alfred info`\n\n",
   "list" : " - See the list of available little delhi items with `alfred list`\n\n",
   "forget" : " - I can remove your order or the info I have on file if you say: `alfred forget (order)` or `alfred forget info`. Note that you can omit `order` and I will defaul to removing your order\n\n",
+  "status" : " - You can check what order you have placed today with: `alfred status`\n\n",
   "stats" : " - You can see some interesting stats with `alfred (full) stats`. Note that you can see two different sets of stats depending on if you use the keyword `full`",
   "showInfo" : " - See the info I have on file by using `alfred info`\n\n",
   "orderFavorite" : " - Place your order from your favorite list by using `alfred order`\n\n",
@@ -19,6 +20,7 @@
   "shortFavorite" : "`alfred favorite \"<item1>, <item2>, ...\"`: place your favorite\n",
   "shortList" : "`alfred list`: see all available items\n",
   "shortForget" : "`alfred forget (order/info)`: forget your order placed today (can omit `order`), or your info\n",
+  "shortStatus" : "`alfred status`: show what you have ordered today\n",
   "shortInfo": "`alfred info (\"<name>, <#>\")`: set your info or omit name and # to show what info I have on you\n",
   "shortHelp": "`alfred full help`: show all features\n"
 }

@@ -19,6 +19,7 @@ Alfie.prototype.fullHelp = function(res) {
   text += Help.favorite;
   text += Help.list;
   text += Help.forget;
+  text += Help.status;
   text += Help.stats;
   text += Help.showInfo;
   text += Help.orderFavorite;
@@ -36,6 +37,7 @@ Alfie.prototype.shortHelp = function(res) {
   text += Help.shortFavorite;
   text += Help.shortList;
   text += Help.shortForget;
+  text += Help.shortStatus;
   text += Help.shortInfo;
 
   console.log('Printed short help text');
