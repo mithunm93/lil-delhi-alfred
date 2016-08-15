@@ -186,7 +186,7 @@ function orderPlacedMessage(fOrder) {
   if (_.last(aOrder)[1])
     text += '(' +  _.last(aOrder)[1] + ')';
 
-  text += '. $' + totalPrice(fOrder) + ' is your order total.';
+  text += '. $' + totalPrice(fOrder).toFixed(2) + ' is your order total.';
   return text;
 }
 
