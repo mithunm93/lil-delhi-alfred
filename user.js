@@ -2,7 +2,6 @@ var _ = require('underscore');
 var FirebaseHelper = require('./firebaseHelper.js');
 var Errors = require('./errors');
 var Slack = require('./slack.js');
-var Help = require('./help');
 var LittleDelhi = require('./littleDelhi');
 
 var User = {prototype: {}};
@@ -37,22 +36,97 @@ User.prototype.forgetInfo = function(user, res) {
   });
 }
 
-// Assembles the help message
-User.prototype.help = function(res) {
-  var text = Help.alfred;
-  text += Help.enterInfo;
-  text += Help.placeOrder;
-  text += Help.orderFinished;
-  text += Help.orderCompletion;
-  text += Help.extraActions;
-  text += Help.favorite;
-  text += Help.list;
-  text += Help.showInfo;
-  text += Help.orderFavorite;
-  text += Help.help;
+// Get user stats:
+//
+// Overall:
+// Top 3 items ordered
+// Total money spent
+// Top 3 orderers
+//
+// User:
+// Top 3 items ordered
+// Total money spent
+// Ranking amoung peers in total money spent
+User.prototype.userStats = function(user, res) {
+  FirebaseHelper.prototype.readAllOrders(function(args) {
+    var orders = args[0];
 
-  console.log('Printed help text');
-  return res.json(slackFormat(null, text));
+    // get overall stats
+    var overallItemFrequency = {};
+    var overallMoneySpent = 0;
+
+    var userStats = {};
+
+    var name;
+    // assemble the food frequency
+    for (day in orders) {
+      for (person in orders[day]) {
+        for (orderIndex in orders[day][person]['order']) {
+
+          // should have been more careful with my naming scheme.. order order order everywhere
+          name = Object.keys(orders[day][person]['order'][orderIndex])[0];
+
+          // overall stats
+          // i.e. { 'Paneer Makhani': 2, 'Garlic Naan': 6 ... }
+          overallItemFrequency[name] = (overallItemFrequency[name] || 0) + 1;
+          overallMoneySpent += LittleDelhi['reversed'][name]['price'];
+
+          // user stats
+          // i.e. { jsmith: { 'Paneer Makhani': 2, 'Garlic Naan': 6, 'spent': 210 ... }, jdoe: { 'Mango Lassi': 2, 'spent': 10 ... } }
+          userStats[person] = userStats[person] || {orders:{}, spent:0};
+          userStats[person]['orders'][name] = (userStats[person]['orders'][name] || 0) + 1;
+          userStats[person]['spent'] = userStats[person]['spent'] + LittleDelhi['reversed'][name]['price'];
+        }
+      }
+    }
+
+    var text;
+    if (user) {
+      // USER
+      // Top 3 user items ordered
+      var frequency = sortByFrequency(userStats[user]['orders']);
+
+      // Ranking among peers in total money spent
+      var spentRankings = _.map(userStats, function(userObject, user) {return [user, Number(userObject['spent'].toFixed(2))] });
+      spentRankings = _.sortBy(spentRankings, function(tuple) { return tuple[1] }).reverse();
+      spentRankings = _.map(spentRankings, function(tuple) { return tuple[0] });
+
+      // Find the user's ranking among the list
+      var userSpentRank = _.indexOf(spentRankings, user) + 1;
+
+      // Assemble the numbers into a message:
+      text = '```Top personal item frequencies:\n'
+      text += formatKVTuples(frequency);
+      text += 'Total personal amount spent:\n$';
+      text += userStats[user]['spent'].toFixed(2) + '\n';
+      text += 'Amount spent ranking:\n'
+      text += userSpentRank;
+      text += '```';
+    } else {
+      // OVERALL
+      // Top 3 overall items ordered
+      var frequency = sortByFrequency(overallItemFrequency, FILTER_BY_ITEMS);
+
+      // Ranking among peers in total money spent
+      var spentRankings = _.map(userStats, function(userObject, user) {return [user, Number(userObject['spent'].toFixed(2))] });
+      spentRankings = _.sortBy(spentRankings, function(tuple) { return tuple[1] }).reverse();
+
+      // Get the top 3 spenders
+      spentRankings.splice(3);
+
+      // Assemble the numbers into a message:
+      text = '```Top overall item frequencies:\n'
+      text += formatKVTuples(frequency);
+      text += 'Note that these items have been omitted: ' + FILTER_BY_ITEMS.join(', ') + '\n';
+      text += 'Top overall spenders:\n';
+      text += formatKVTuples(spentRankings);
+      text += 'Total overall amount spent:\n$';
+      text += overallMoneySpent.toFixed(2);
+      text += '```';
+    }
+
+    return res.json(slackFormat(user || 'here', text));
+  });
 }
 
 // Get user stats:
