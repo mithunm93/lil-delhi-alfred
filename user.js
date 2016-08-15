@@ -116,9 +116,9 @@ User.prototype.userStats = function(user, res) {
       // Assemble the numbers into a message:
       text = '```Top personal item frequencies:\n'
       text += formatKVTuples(frequency);
-      text += 'Total personal amount spent:\n$';
+      text += 'Total personal amount spent: $';
       text += userStats[user]['spent'].toFixed(2) + '\n';
-      text += 'Amount spent ranking:\n'
+      text += 'Amount spent ranking: '
       text += userSpentRank;
       text += '```';
     } else {
@@ -134,12 +134,11 @@ User.prototype.userStats = function(user, res) {
       spentRankings.splice(3);
 
       // Assemble the numbers into a message:
-      text = '```Top overall item frequencies:\n'
+      text = '```Top overall entree frequencies:\n'
       text += formatKVTuples(frequency);
-      text += 'Note that these items have been omitted: ' + FILTER_BY_ITEMS.join(', ') + '\n';
       text += 'Top overall spenders:\n';
-      text += formatKVTuples(spentRankings);
-      text += 'Total overall amount spent:\n$';
+      text += formatKVTuples(spentRankings, '$');
+      text += 'Total overall amount spent: $';
       text += overallMoneySpent.toFixed(2);
       text += '```';
     }
@@ -151,16 +150,13 @@ User.prototype.userStats = function(user, res) {
 // ______________________HELPER METHODS_______________________________
 
 // returns the array of tuples formated as such:
-// '<array[0][0]>: <array[0][1]>\n<array[1][0]>: <array[1][1]>\n...'
-function formatKVTuples(array) {
+// ' - <array[0][0]>: <pre><array[0][1]>\n<array[1][0]>: <pre><array[1][1]>\n...'
+function formatKVTuples(array, pre) {
+  pre = pre || '';
   var text = '';
   for (var i=0;i<array.length;i++)
-    text += array[i][0] + ': ' + array[i][1] + '\n';
+    text += ' - ' + array[i][0] + ': ' + pre + array[i][1] + '\n';
   return text;
-}
-// non filtering sort
-function sortByFrequency(orders) {
-  return sortByFrequency(orders, null);
 }
 
 // Sorts the given JS object by item frequency, assuming 'orders' is structured like so:
