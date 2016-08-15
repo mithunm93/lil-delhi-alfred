@@ -84,6 +84,27 @@ function commands(args) {
 
       User.prototype.userInfo(user, message, res);
     }
+  } else if (text.indexOf('stats') !== -1) {
+    // get stats for the user
+
+    FirebaseHelper.prototype.checkInfoExistsThenRun(user, function(){
+      if (text.indexOf('full') !== -1) {
+        // Format of full stats request should be like so:
+        //
+        //                                     alfred full stats
+        //                                             ^    ^
+        // 'full' to indicate overall stats request ___|    |
+        // 'stats' to inidcate stats request _______________|
+        User.prototype.userStats(null, res);
+      } else {
+        // Format of stats request should be like so:
+        //
+        //                                     alfred stats
+        //                                             ^
+        // 'stats' to inidcate stats request __________|
+        User.prototype.userStats(user, res);
+      }
+    }, function() {noUserInfoWarning(user, res)});
   } else if (text.indexOf('favorite') !== -1) {
     // check if favorite set request
 
