@@ -139,13 +139,17 @@ function commands(args) {
   } else if (text.indexOf('help') !== -1) {
     // chek if requesting help
 
-    // Format of list request should be like so:
-    //
-    //                                     alfred help
-    //                                             ^
-    // 'help' to inidcate list request ____________|
+    if (text.indexOf('full') !== -1) {
+      // Format of list request should be like so:
+      //
+      //                                     alfred help
+      //                                             ^
+      // 'help' to inidcate list request ____________|
 
-    Alfie.prototype.fullHelp(res);
+      Alfie.prototype.fullHelp(res);
+    } else {
+      Alfie.prototype.shortHelp(res);
+    }
   } else if (text.indexOf('status') !== -1) {
     // show the current status of the order
 

@@ -28,4 +28,17 @@ Alfie.prototype.fullHelp = function(res) {
   console.log('Printed full help text');
   return res.json(slackFormat(null, text));
 }
+
+// Assemble the short help message
+Alfie.prototype.shortHelp = function(res) {
+  var text = Help.shortHelp;
+  text += Help.shortOrder;
+  text += Help.shortFavorite;
+  text += Help.shortList;
+  text += Help.shortForget;
+  text += Help.shortInfo;
+
+  console.log('Printed short help text');
+  return res.json(slackFormat(null, text));
+}
 module.exports = Alfie;

@@ -13,5 +13,12 @@
   "showInfo" : " - See the info I have on file by using `alfred info`\n\n",
   "orderFavorite" : " - Place your order from your favorite list by using `alfred order`\n\n",
   "thank" : " - If you're feeling generous, you can even thank me with `alfred thanks`",
-  "help" : " - See this help list by using `alfred help`\n\n"
+  "help" : " - See this help list by using `alfred full help`\n\n",
+
+  "shortOrder" : "`alfred order \"<item1>, <item2>, ...\"`: place your order\n",
+  "shortFavorite" : "`alfred favorite \"<item1>, <item2>, ...\"`: place your favorite\n",
+  "shortList" : "`alfred list`: see all available items\n",
+  "shortForget" : "`alfred forget (order/info)`: forget your order placed today (can omit `order`), or your info\n",
+  "shortInfo": "`alfred info (\"<name>, <#>\")`: set your info or omit name and # to show what info I have on you\n",
+  "shortHelp": "`alfred full help`: show all features\n"
 }
