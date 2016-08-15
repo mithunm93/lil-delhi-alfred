@@ -145,7 +145,7 @@ function commands(args) {
     //                                             ^
     // 'help' to inidcate list request ____________|
 
-    User.prototype.help(res);
+    Alfie.prototype.help(res);
   } else if (text.indexOf('status') !== -1) {
     // show the current status of the order
 
