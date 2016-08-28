@@ -10,6 +10,12 @@ var slackFormat = Slack.prototype.slackFormat;
 
 var FILTER_BY_ITEMS = ['Naan', 'Garlic Naan', 'Rice Pillau', 'Samosa', 'Mango Lassi'];
 
+// amout of time spent logging in, getting to Little Delhi, and submitting order
+var BASE_TIME = 30;
+
+// amount of time selecting and adding each order
+var PER_ORDER_TIME = 5;
+
 // used for "alfred info"
 User.prototype.userInfo = function(user, text, res) {
   if (text === '')
@@ -42,6 +48,7 @@ User.prototype.forgetInfo = function(user, res) {
 // Top 3 items ordered
 // Total money spent
 // Top 3 orderers
+// Total time saved
 //
 // User:
 // Top 3 items ordered
@@ -54,6 +61,7 @@ User.prototype.userStats = function(user, res) {
     // get overall stats
     var overallItemFrequency = {};
     var overallMoneySpent = 0;
+    var overallTimeSpent = 0;
 
     var userStats = {};
 
@@ -61,6 +69,11 @@ User.prototype.userStats = function(user, res) {
     // assemble the food frequency
     for (day in orders) {
       for (person in orders[day]) {
+
+        userStats[person] = userStats[person] || {orders:{}, spent:0, time:0};
+        userStats[person]['time'] += BASE_TIME;
+        overallTimeSpent += BASE_TIME
+
         for (orderIndex in orders[day][person]['order']) {
 
           // should have been more careful with my naming scheme.. order order order everywhere
@@ -70,12 +83,13 @@ User.prototype.userStats = function(user, res) {
           // i.e. { 'Paneer Makhani': 2, 'Garlic Naan': 6 ... }
           overallItemFrequency[name] = (overallItemFrequency[name] || 0) + 1;
           overallMoneySpent += LittleDelhi['reversed'][name]['price'];
+          overallTimeSpent += PER_ORDER_TIME
 
           // user stats
           // i.e. { jsmith: { 'Paneer Makhani': 2, 'Garlic Naan': 6, 'spent': 210 ... }, jdoe: { 'Mango Lassi': 2, 'spent': 10 ... } }
-          userStats[person] = userStats[person] || {orders:{}, spent:0};
           userStats[person]['orders'][name] = (userStats[person]['orders'][name] || 0) + 1;
-          userStats[person]['spent'] = userStats[person]['spent'] + LittleDelhi['reversed'][name]['price'];
+          userStats[person]['spent'] +=  LittleDelhi['reversed'][name]['price'];
+          userStats[person]['time'] += PER_ORDER_TIME;
         }
       }
     }
@@ -100,7 +114,9 @@ User.prototype.userStats = function(user, res) {
       text += 'Total personal amount spent: $';
       text += userStats[user]['spent'].toFixed(2) + '\n';
       text += 'Amount spent ranking: '
-      text += userSpentRank;
+      text += userSpentRank + '\n';
+      // text += 'Total personal time saved (conservative): '
+      // text += formatSecondsToMinutes(userStats[person]['time']) + '\n';
       text += '```';
     } else {
       // OVERALL
@@ -120,7 +136,9 @@ User.prototype.userStats = function(user, res) {
       text += 'Top overall spenders:\n';
       text += formatKVTuples(spentRankings, '$');
       text += 'Total overall amount spent: $';
-      text += overallMoneySpent.toFixed(2);
+      text += overallMoneySpent.toFixed(2) + '\n';
+      text += 'Total time saved (conservative): '
+      text += formatSecondsToHours(overallTimeSpent) + '\n';
       text += '```';
     }
 
@@ -129,6 +147,18 @@ User.prototype.userStats = function(user, res) {
 }
 
 // ______________________HELPER METHODS_______________________________
+
+function formatSecondsToHours(time) {
+  return formatTime(time, 3600, 'hours');
+}
+
+function formatSecondsToMinutes(time) {
+  return formatTime(time, 60, 'minutes');
+}
+
+function formatTime(time, d, unit) {
+  return (time/d).toFixed(1) + ' ' + unit;
+}
 
 // returns the array of tuples formated as such:
 // ' - <array[0][0]>: <pre><array[0][1]>\n<array[1][0]>: <pre><array[1][1]>\n...'
