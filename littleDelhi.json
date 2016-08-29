@@ -107,7 +107,7 @@
     "Dal Soup": { "name": "dal soup", "price": 3.25 },
     "Chicken Soup": { "name": "chicken soup", "price": 3.25 },
     "Tomato Soup": { "name": "tomato soup", "price": 3.25 },
-    "Green Mixed salad": { "name": "green mixed salad", "price": 2.99 },
+    "Green Mixed Salad": { "name": "green mixed salad", "price": 2.99 },
 
     "Chana Masala": { "name": "chana masala", "price": 7.99, "spiceOptions": true },
     "Chana Aloo": { "name": "chana aloo", "price": 7.99, "spiceOptions": true },
