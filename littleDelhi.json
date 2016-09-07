@@ -137,8 +137,8 @@
 
     "Lamb Curry (Chef Recommended)": { "name": "lamb curry", "price": 9.99, "spiceOptions": true },
     "Lamb Saag": { "name": "lamb saag", "price": 10.99, "spiceOptions": true },
-    "Lamb Tikka masala": { "name": "lamb tikka masala", "price": 10.99, "spiceOptions": true },
-    "Lamb Rogan josh": { "name": "lamb rogan josh", "price": 10.99, "spiceOptions": true },
+    "Lamb Tikka Masala": { "name": "lamb tikka masala", "price": 10.99, "spiceOptions": true },
+    "Lamb Rogan Josh": { "name": "lamb rogan josh", "price": 10.99, "spiceOptions": true },
     "Lamb Vindaloo": { "name": "lamb vindaloo", "price": 10.99, "spiceOptions": true },
     "Lamb Korma": { "name": "lamb korma", "price": 10.99, "spiceOptions": true },
     "Lamb Rasala": { "name": "lamb rasala", "price": 10.99, "spiceOptions": true },
