@@ -1,15 +1,13 @@
-var Slack = require('./slack.js');
-var Help = require('./help');
-var slackFormat = Slack.prototype.slackFormat;
+import * as Slack from "./slack.js";
+import Help from "./help";
+const slackFormat = Slack.slackFormat;
 
-var Alfie = {prototype: {}};
-
-Alfie.prototype.thank = function(user, res) {
+export const thank = (user, res) => {
   return res.json(slackFormat(user, "you're welcome"));
 }
 
 // Assembles the full help message
-Alfie.prototype.fullHelp = function(res) {
+export const fullHelp = (res) => {
   var text = Help.alfred;
   text += Help.enterInfo;
   text += Help.placeOrder;
@@ -31,7 +29,7 @@ Alfie.prototype.fullHelp = function(res) {
 }
 
 // Assemble the short help message
-Alfie.prototype.shortHelp = function(res) {
+export const shortHelp = (res) => {
   var text = Help.shortHelp;
   text += Help.shortOrder;
   text += Help.shortFavorite;
@@ -43,4 +41,3 @@ Alfie.prototype.shortHelp = function(res) {
   console.log('Printed short help text');
   return res.json(slackFormat(null, text));
 }
-module.exports = Alfie;

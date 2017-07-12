@@ -1,27 +1,21 @@
-var _ = require('underscore');
-var FirebaseHelper = require('./firebaseHelper.js');
-var Errors = require('./errors');
-var Slack = require('./slack.js');
-var LittleDelhi = require('./littleDelhi');
+import _ from "underscore";
+import * as FirebaseHelper from "./firebaseHelper.js";
+import Errors from "./errors";
+import * as Slack from "./slack.js";
+import LittleDelhi from "./littleDelhi";
 
-var User = {prototype: {}};
-var firebase = FirebaseHelper.prototype.ref;
-var slackFormat = Slack.prototype.slackFormat;
-
-var FILTER_BY_ITEMS = ['Naan', 'Garlic Naan', 'Rice Pillau', 'Samosa', 'Mango Lassi'];
+const firebase = FirebaseHelper.ref;
+const slackFormat = Slack.slackFormat;
+const FILTER_BY_ITEMS = ['Naan', 'Garlic Naan', 'Rice Pillau', 'Samosa', 'Mango Lassi'];
 
 // used for "alfred info"
-User.prototype.userInfo = function(user, text, res) {
-  if (text === '')
-    showInfo(user, res);
-  else
-    setInfo(user, text, res);
-};
+export const userInfo = (user, text, res) =>
+  (text === '') ? showInfo(user, res) : setInfo(user, text, res);
 
 // Removes the user's info from Firebase, including their favorite
-User.prototype.forgetInfo = function(user, res) {
-  FirebaseHelper.prototype.checkInfoExistsThenRun(user, function(args) {
-    FirebaseHelper.prototype.removeFirebaseUser(user, function(error) {
+export const forgetInfo = (user, res) => {
+  FirebaseHelper.checkInfoExistsThenRun(user, (args) => {
+    FirebaseHelper.removeFirebaseUser(user, (error) => {
       if (error) {
         console.log("ERROR forgetting user info: " + error);
         return res.json(slackFormat(user, "Something went wrong when trying to remove your info"));
@@ -30,7 +24,7 @@ User.prototype.forgetInfo = function(user, res) {
         return res.json(slackFormat(user, "Your info has been removed"));
       }
     });
-  }, function() {
+  }, () => {
     console.log('No info exists for: ' + user);
     return res.json(slackFormat(user, 'No info exists for you'));
   });
@@ -47,8 +41,8 @@ User.prototype.forgetInfo = function(user, res) {
 // Top 3 items ordered
 // Total money spent
 // Ranking amoung peers in total money spent
-User.prototype.userStats = function(user, res) {
-  FirebaseHelper.prototype.readAllOrders(function(args) {
+export const userStats = (user, res) => {
+  FirebaseHelper.readAllOrders((args) => {
     var orders = args[0];
 
     // get overall stats
@@ -59,9 +53,9 @@ User.prototype.userStats = function(user, res) {
 
     var name;
     // assemble the food frequency
-    for (day in orders) {
-      for (person in orders[day]) {
-        for (orderIndex in orders[day][person]['order']) {
+    for (let day in orders) {
+      for (let person in orders[day]) {
+        for (let orderIndex in orders[day][person]['order']) {
 
           // should have been more careful with my naming scheme.. order order order everywhere
           name = Object.keys(orders[day][person]['order'][orderIndex])[0];
@@ -87,102 +81,9 @@ User.prototype.userStats = function(user, res) {
       var frequency = sortByFrequency(userStats[user]['orders']);
 
       // Ranking among peers in total money spent
-      var spentRankings = _.map(userStats, function(userObject, user) {return [user, Number(userObject['spent'].toFixed(2))] });
-      spentRankings = _.sortBy(spentRankings, function(tuple) { return tuple[1] }).reverse();
-      spentRankings = _.map(spentRankings, function(tuple) { return tuple[0] });
-
-      // Find the user's ranking among the list
-      var userSpentRank = _.indexOf(spentRankings, user) + 1;
-
-      // Assemble the numbers into a message:
-      text = '```Top personal item frequencies:\n'
-      text += formatKVTuples(frequency);
-      text += 'Total personal amount spent:\n$';
-      text += userStats[user]['spent'].toFixed(2) + '\n';
-      text += 'Amount spent ranking:\n'
-      text += userSpentRank;
-      text += '```';
-    } else {
-      // OVERALL
-      // Top 3 overall items ordered
-      var frequency = sortByFrequency(overallItemFrequency, FILTER_BY_ITEMS);
-
-      // Ranking among peers in total money spent
-      var spentRankings = _.map(userStats, function(userObject, user) {return [user, Number(userObject['spent'].toFixed(2))] });
-      spentRankings = _.sortBy(spentRankings, function(tuple) { return tuple[1] }).reverse();
-
-      // Get the top 3 spenders
-      spentRankings.splice(3);
-
-      // Assemble the numbers into a message:
-      text = '```Top overall item frequencies:\n'
-      text += formatKVTuples(frequency);
-      text += 'Note that these items have been omitted: ' + FILTER_BY_ITEMS.join(', ') + '\n';
-      text += 'Top overall spenders:\n';
-      text += formatKVTuples(spentRankings);
-      text += 'Total overall amount spent:\n$';
-      text += overallMoneySpent.toFixed(2);
-      text += '```';
-    }
-
-    return res.json(slackFormat(user || 'here', text));
-  });
-}
-
-// Get user stats:
-//
-// Overall:
-// Top 3 items ordered
-// Total money spent
-// Top 3 orderers
-//
-// User:
-// Top 3 items ordered
-// Total money spent
-// Ranking amoung peers in total money spent
-User.prototype.userStats = function(user, res) {
-  FirebaseHelper.prototype.readAllOrders(function(args) {
-    var orders = args[0];
-
-    // get overall stats
-    var overallItemFrequency = {};
-    var overallMoneySpent = 0;
-
-    var userStats = {};
-
-    var name;
-    // assemble the food frequency
-    for (day in orders) {
-      for (person in orders[day]) {
-        for (orderIndex in orders[day][person]['order']) {
-
-          // should have been more careful with my naming scheme.. order order order everywhere
-          name = Object.keys(orders[day][person]['order'][orderIndex])[0];
-
-          // overall stats
-          // i.e. { 'Paneer Makhani': 2, 'Garlic Naan': 6 ... }
-          overallItemFrequency[name] = (overallItemFrequency[name] || 0) + 1;
-          overallMoneySpent += LittleDelhi['reversed'][name]['price'];
-
-          // user stats
-          // i.e. { jsmith: { 'Paneer Makhani': 2, 'Garlic Naan': 6, 'spent': 210 ... }, jdoe: { 'Mango Lassi': 2, 'spent': 10 ... } }
-          userStats[person] = userStats[person] || {orders:{}, spent:0};
-          userStats[person]['orders'][name] = (userStats[person]['orders'][name] || 0) + 1;
-          userStats[person]['spent'] = userStats[person]['spent'] + LittleDelhi['reversed'][name]['price'];
-        }
-      }
-    }
-
-    var text;
-    if (user) {
-      // USER
-      // Top 3 user items ordered
-      var frequency = sortByFrequency(userStats[user]['orders']);
-
-      // Ranking among peers in total money spent
-      var spentRankings = _.map(userStats, function(userObject, user) {return [user, Number(userObject['spent'].toFixed(2))] });
-      spentRankings = _.sortBy(spentRankings, function(tuple) { return tuple[1] }).reverse();
-      spentRankings = _.map(spentRankings, function(tuple) { return tuple[0] });
+      var spentRankings = _.map(userStats, (userObject, user) => [user, Number(userObject['spent'].toFixed(2))]);
+      spentRankings = _.sortBy(spentRankings, tuple => tuple[1]).reverse();
+      spentRankings = _.map(spentRankings, tuple => tuple[0]);
 
       // Find the user's ranking among the list
       var userSpentRank = _.indexOf(spentRankings, user) + 1;
@@ -201,8 +102,8 @@ User.prototype.userStats = function(user, res) {
       var frequency = sortByFrequency(overallItemFrequency, FILTER_BY_ITEMS);
 
       // Ranking among peers in total money spent
-      var spentRankings = _.map(userStats, function(userObject, user) {return [user, Number(userObject['spent'].toFixed(2))] });
-      spentRankings = _.sortBy(spentRankings, function(tuple) { return tuple[1] }).reverse();
+      var spentRankings = _.map(userStats, (userObject, user) => [user, Number(userObject['spent'].toFixed(2))]);
+      spentRankings = _.sortBy(spentRankings, tuple => tuple[1]).reverse();
 
       // Get the top 3 spenders
       spentRankings.splice(3);
@@ -242,10 +143,10 @@ function sortByFrequency(orders, filterBy) {
     orders = _.omit(orders, filterBy);
 
   // convert to array of tuples for sorting
-  orders = _.map(orders, function(frequency, name) { return [name, frequency] });
+  orders = _.map(orders, (frequency, name) => [name, frequency]);
 
   // sort by descending frequency
-  orders = _.sortBy(orders, function(tuple) { return tuple[1] }).reverse();
+  orders = _.sortBy(orders, tuple => tuple[1]).reverse();
 
   // only leave the first 3
   orders.splice(3);
@@ -258,7 +159,7 @@ function sortByFrequency(orders, filterBy) {
 // be able to access their information, otherwise they need to
 // setInfo
 function showInfo(user, res) {
-  FirebaseHelper.prototype.checkInfoExistsThenRun(user, function(args) {
+  FirebaseHelper.checkInfoExistsThenRun(user, (args) => {
     var info = args[0];
 
     var text = '```';
@@ -268,7 +169,7 @@ function showInfo(user, res) {
     text += ('Favorite: ');
 
     if (info.favorite) {
-      for (item of info.favorite) {
+      for (let item of info.favorite) {
         // name of item
         var name = Object.keys(item)[0];
         text += name;
@@ -285,7 +186,7 @@ function showInfo(user, res) {
     text += '```';
 
     return res.json(slackFormat(user, text));
-  }, function() {
+  }, () => {
     console.log('No info exists for: ' + user);
     return res.json(slackFormat(user, 'No info exists for you'));
   });
@@ -331,9 +232,7 @@ function setInfo(user, text, res) {
 
   u.number = number;
 
-  FirebaseHelper.prototype.writeFirebaseUser(user, u);
+  FirebaseHelper.writeFirebaseUser(user, u);
 
   return res.json(slackFormat(user, 'Thank you for the info'));
 }
-module.exports = User;
-

@@ -1,28 +1,24 @@
-var express = require('express');
-var bodyParser = require('body-parser');
-var commands = require('./commands.js');
-var private = require('./private');
-var Order = require('./order');
-var Slack = require('./slack.js');
+import express from "express";
+import bodyParser from "body-parser";
+import commands from "./commands";
+import * as Order from "./order";
+import * as Slack from "./slack";
 
-var app = express();
-var port = process.env.PORT || 3000;
-
+const app = express();
+const port = process.env.PORT || 3000;
 
 // body parser middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.post('/commands', commands);
-app.post('/ping_slack', Slack.prototype.pingSlack);
-app.post('/order_completed', Order.prototype.orderComplete);
-app.get('/get_orders', Order.prototype.readTodaysFirebaseOrders);
+app.post("/commands", commands);
+app.post("/ping_slack", Slack.pingSlack);
+app.post("/order_completed", Order.orderComplete);
+app.get("/get_orders", Order.readTodaysFirebaseOrders);
 
 // error handler
-app.use(function (err, req, res, next) {
+app.use((err, req, res) => {
    console.error(err.stack);
    res.status(400).send(err.message);
 });
 
-app.listen(port, function () {
-   console.log('Slack bot listening on port ' + port);
-});
+app.listen(port, () => console.log("Slack bot listening on port " + port));

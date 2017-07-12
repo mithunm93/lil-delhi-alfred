@@ -1,3 +1,4 @@
 private.json
 node_modules/
 heroku/
+dist/
