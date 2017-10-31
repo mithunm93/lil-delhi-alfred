@@ -152,7 +152,7 @@ casper.waitForSelector("table#resultstable", function() {
   getAllMatches(RESTAURANTS_REGEX, decodeString(this.getPageContent()))
     .forEach(function(info) {
       if (restaurants[info[4]]) return;
-      casper.echo(restaurants[info[4]]);
+
       restaurants[info[4]] = {
         description: info[1],
         openTime: info[2],
