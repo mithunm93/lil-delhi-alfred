@@ -24,7 +24,8 @@ const shortDelay = 500; // for waiting between actions
 const RESTAURANTS_REGEX = /"vendorLocation"[\s\S]*?body=\[(.*?)<.*?<em>Hours: (.*?) - (.*?)<[\s\S]*?">(.*?)<[\s\S]*?<td class="Distance">\$(\S+)[\s\S]*?(\+\$(\S+)[\s\S]*?)?<\/td>/g;
 const CATEGORY_REGEX = /title="Hide (.+)"[\s\S]*?<\!--menucategory-->/g;
 const ITEMS_REGEX = /header=\[(.+) - \$?(.+)\] body=\[(.*)\s\]/g;
-const OPTIONS_REGEX = /price="(([\d]+\.)?[\d]+)_0[\s\S]*?type="radio"[\s\S]*?>(.*?)</g;
+const OPTIONS_CATEGORY_REGEX = /<h3>(.+?)<span>[\s\S]+?<\/ul>/g;
+const OPTIONS_REGEX = /price="(([\d]+\.)?[\d]+)_0" type="(.+?)"[\s\S]*?>\*?(.*?)</g;
 
 // casper.getPageContent() sometimes returns &lt; and &gt; instead of < and >, so
 // this will decode that.
@@ -85,12 +86,18 @@ function clickItems(items, i, restaurant) {
     casper.echo("Loaded " + name);
 
     const options = {};
-    getAllMatches(OPTIONS_REGEX, decodeString(casper.getPageContent()))
-      .forEach(function(info) {
-        options[info[3]] = {
-          name: info[3],
-          price: info[1],
-        };
+
+    getAllMatches(OPTIONS_CATEGORY_REGEX, decodeString(casper.getPageContent()))
+      .forEach(function(category) {
+        getAllMatches(OPTIONS_REGEX, decodeString(category[0]))
+          .forEach(function(info) {
+            options[info[4]] = {
+              category: category[1],
+              name: info[4],
+              price: info[1],
+              singleChoice: info[3] === "radio",
+            };
+          });
       });
     items[name].options = options;
 
@@ -145,7 +152,7 @@ casper.waitForSelector("table#resultstable", function() {
   getAllMatches(RESTAURANTS_REGEX, decodeString(this.getPageContent()))
     .forEach(function(info) {
       if (restaurants[info[4]]) return;
-      casper.echo(restaurants[info[4]]);
+
       restaurants[info[4]] = {
         description: info[1],
         openTime: info[2],
