@@ -3,11 +3,10 @@ const uniqBy = require("lodash.uniqby");
 const flattenDeep = require("lodash.flattendeep");
 const restaurants = require("../data/restaurants.json");
 
-const SIMPLE_REGEX = /^(.+?)(\s[&'"].*)?$/;
-const NO_PARENS_REGEX = /^(.+?)(\s[\(].*)?$/;
+const SIMPLE_REGEX = /^(.+?)(\s*[&'"-].*)?$/;
+const NO_PARENS_REGEX = /^(.+?)(\s+\([\s\S]+\))?$/;
 const FIRST_TWO_WORDS_REGEX = /^\s*(\S+(\s\S+)?)/;
 const WITHOUT_NUMBER_REGEX = /^(\S+?\.\s*)?(.*)$/;
-const WITHOUT_PRICE_REGEX = /^(.+?)(\s+\([\s\S]+\))?$/;
 const MAX_LENGTH = 2000;
 
 function writeFiles(name, data) {
@@ -86,12 +85,12 @@ const optionNames = uniqBy(flattenDeep(
 
           const value = JSON.stringify(option);
           const optNoPriceOrEscapeOrNumber = WITHOUT_NUMBER_REGEX.exec(
-            replaceQuotes(WITHOUT_PRICE_REGEX.exec(option)[1])
+            replaceQuotes(NO_PARENS_REGEX.exec(option)[1])
           )[2];
           const synonyms = flatUniqCase([
             option,
             optNoPriceOrEscapeOrNumber,
-            FIRST_TWO_WORDS_REGEX.exec(optNoPriceOrEscapeOrNumber)[0],
+            SIMPLE_REGEX.exec(optNoPriceOrEscapeOrNumber)[1],
           ]);
 
           return { entity: "option-name", value, synonyms };
