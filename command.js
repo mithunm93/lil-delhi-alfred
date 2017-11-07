@@ -38,7 +38,11 @@ export default function command(req, res) {
             return res.json(formatError(order.error, req.body.user));
           }
 
-          log("Message parsed from entities", order);
+          log("Message parsed from entities", {
+            restaurant: order.restaurant.name,
+            menuItems: order.menuItems.map(m => m.name),
+            options: order.options,
+          });
           return res.json(formatOrder(order, req.body.user));
         default:
           logErr("No matching intent received");
