@@ -1,6 +1,7 @@
 {
   "INVALID_COMMAND_TEXT" : "I am sorry, I did not understand that statement. Please use 'alfred help' to learn about my features",
   "UNAUTHORIZED_ACCESS" : "Improper token received",
+  "MALFORMED_REQUEST" : "The request was incorrect",
 
   "INVALID_ORDER_TEXT" : " is not a valid Little Delhi item. Use: 'alfred list' to see the list of valid items",
   "NO_SPICE_OPTION_TEXT" : " does not have a spice option",
@@ -10,5 +11,7 @@
   "NO_ORDER_TEXT" : " you have not placed an order today.",
 
   "INVALID_INFO_TEXT" : " is invalid. Your command must be formatted as such: alfred info \"<FIRST> <LAST>, ##########\"",
-  "ORDER_ALREADY_PLACED_TEXT" : " the order has already been placed today, your order has not been submitted"
+  "ORDER_ALREADY_PLACED_TEXT" : " the order has already been placed today, your order has not been submitted",
+
+  "NO_MENU_ITEMS": "There were no menu items detected in the message"
 }

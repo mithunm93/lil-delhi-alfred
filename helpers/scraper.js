@@ -10,7 +10,7 @@ var casper = require("casper").create({
 const x = require("casper").selectXPath;
 const fs = require("fs");
 
-const private = JSON.parse(fs.read("../private.json"));
+const secret = JSON.parse(fs.read("../private.json"));
 const restaurants = JSON.parse(fs.read("../data/restaurants.json") || "{}");
 
 const url = "https://www.seamless.com/corporate/login";
@@ -131,8 +131,8 @@ casper.waitForSelector("form#widgetLoginForm", function() {
   casper.echo("Step 0: main page loaded");
   casper.echo("Logging in");
   this.fill("form#widgetLoginForm", {
-    "username": private.username,
-    "password":  private.password
+    "username": secret.username,
+    "password":  secret.password
   }, true);
 }, timeoutFunction, timeout);
 

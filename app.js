@@ -1,8 +1,6 @@
 import express from "express";
 import bodyParser from "body-parser";
-import commands from "./commands";
-import * as Order from "./order";
-import * as Slack from "./slack";
+import command from "./command";
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -10,10 +8,7 @@ const port = process.env.PORT || 3000;
 // body parser middleware
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.post("/commands", commands);
-app.post("/ping_slack", Slack.pingSlack);
-app.post("/order_completed", Order.orderComplete);
-app.get("/get_orders", Order.readTodaysFirebaseOrders);
+app.post("/command", command);
 
 // error handler
 app.use((err, req, res) => {

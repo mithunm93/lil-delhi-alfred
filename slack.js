@@ -15,6 +15,56 @@ export const slackFormat = (user, text) => {
   return { text: t };
 }
 
+const colors = {
+  YELLOW: "warning",
+  RED: "danger",
+  GREEN: "good",
+  BLUE: "#4141f4",
+};
+
+const calculatePrice = (menuItem, options = []) => [menuItem, ...options]
+  .reduce((total, item) => {
+    const price = parseInt(item.price, 10);
+    return price ? total + price : total;
+  }, 0);
+
+const formatUser = user => (user ? `<@${user}> ` : "");
+
+export const formatOrder = (order, user) => {
+  const orderTotal = order.menuItems
+    .reduce((total, m) => total + calculatePrice(m, order.options[m.name]), 0);
+  return ({
+    text: `${formatUser(user)}here is your order from *${order.restaurant.name}*`,
+    attachments: [
+      ...order.menuItems.map(m => ({
+        color: colors.GREEN,
+        title: m.name,
+        text: m.description,
+        fields: ((order.options[m.name] || []).length > 0 ? [{
+          title: "Options",
+          value: order.options[m.name].map(o => o.name).join(", "),
+        }] : null),
+        footer: `$${calculatePrice(m, order.options[m.name])}`,
+        mrkdwn_in: ["pretext"],
+      })),
+      {
+        title: "Total price",
+        color: orderTotal < 25 ? colors.GREEN : colors.YELLOW,
+        text: `$${orderTotal}`,
+        footer: orderTotal > 25 ? "Your order exceeds the $25 limit, it may be removed if the budget is exceeded" : null,
+      },
+    ],
+  });
+};
+
+export const formatError = (error, user) => ({
+  attachments: [{
+    color: colors.RED,
+    pretext: `${formatUser(user)}there was a problem with your request`,
+    title: error,
+  }],
+});
+
 // POSTs messages to slack, this is the incoming webhook portion
 // of the Slack API, the only place from which we initiate Slack
 // messages, the majority of others are simply returned with the
