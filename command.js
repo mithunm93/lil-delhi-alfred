@@ -13,6 +13,11 @@ function verifyBody(req) {
 export default function command(req, res) {
   log("Received message from Meraki slack");
 
+  // TEMPORARY
+  if (["alfred", "alfy", "alf", "alfie"].every(a => req.body.text.toLowerCase().indexOf(a) !== 0)) {
+    return res.send(200);
+  }
+
   const error = verifyBody(req);
   if (error) {
     logErr("Request verification failed", error);
@@ -21,7 +26,7 @@ export default function command(req, res) {
 
   log("Sending text to watson", req.body.text);
   parse(req.body.text)
-    .then((response, error) => {
+    .then(({ response, error }) => {
 
       if (error) return logErr("Watson message failed", error);
 
@@ -38,7 +43,11 @@ export default function command(req, res) {
             return res.json(formatError(order.error, req.body.user));
           }
 
-          log("Message parsed from entities", order);
+          log("Message parsed from entities", {
+            restaurant: order.restaurant.name,
+            menuItems: order.menuItems.map(m => m.name),
+            options: order.options,
+          });
           return res.json(formatOrder(order, req.body.user));
         default:
           logErr("No matching intent received");
