@@ -13,6 +13,11 @@ function verifyBody(req) {
 export default function command(req, res) {
   log("Received message from Meraki slack");
 
+  // TEMPORARY
+  if (["alfred", "alfy", "alf", "alfie"].every(a => req.body.text.toLowerCase().indexOf(a) !== 0)) {
+    return res.send(200);
+  }
+
   const error = verifyBody(req);
   if (error) {
     logErr("Request verification failed", error);
