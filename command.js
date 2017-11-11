@@ -21,7 +21,7 @@ export default function command(req, res) {
 
   log("Sending text to watson", req.body.text);
   parse(req.body.text)
-    .then((response, error) => {
+    .then(({ response, error }) => {
 
       if (error) return logErr("Watson message failed", error);
 
